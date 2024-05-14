@@ -18,13 +18,16 @@ func MyOracle(ch chan Msg, id string) {
 
 	message := <-ch
 	fmt.Println(message)
+	defer wg.Done()
 }
 
 func spawnMyOracle(id string, max int, channels []chan Msg) {
 	num = generateRandom(max)
 	for i := 0; i < len(channels); i++ {
+		wg.Add(1)
 		go MyOracle(channels[i], id)
 	}
+	//fmt.Print("Ended")
 }
 
 func generateRandom(max int) int {

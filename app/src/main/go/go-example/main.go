@@ -1,9 +1,14 @@
 package main
 
+import "sync"
+
+var wg sync.WaitGroup
+
 func main() {
 	var numAgents = 5
 	var max = 100
 	var channels []chan Msg
+
 	//ch := spawnMyOracle("0")
 
 	for i := 0; i < numAgents; i++ {
@@ -17,4 +22,5 @@ func main() {
 	for i := 0; i < numAgents; i++ {
 		spawnMyPlayer(max, channels[i])
 	}
+	wg.Wait()
 }
