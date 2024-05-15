@@ -6,7 +6,7 @@ var wg sync.WaitGroup
 
 func main() {
 	var numAgents = 5 // Numero di agenti che indovinano.
-	var max = 100000000
+	var max = 1000
 	var channels []chan Msg // Creato un canale per ogni agente per comunicare con l'oracolo.
 
 	for i := 0; i < numAgents; i++ {
