@@ -3,35 +3,61 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
+	"sync"
 )
 
 type Msg struct {
 	content  string
-	senderId string
 }
 
-var num int
+var numToGuess int
+var winner bool = false
+var turnSync sync.WaitGroup
 
 func MyOracle(ch chan Msg, id string) {
-	msg := Msg{content: "Start", senderId: id}
-	ch <- msg
+	ch <- Msg{content: "Start"}
+	attempt := <-ch
+	numReceived, err := strconv.Atoi(attempt.content)
+	if err != nil {
+        fmt.Println("Errore durante la conversione della stringa in intero:", err)
+        return
+    }
 
-	message := <-ch
-	fmt.Println(message)
+	if numReceived > numToGuess {
+		ch <- Msg{content: "lower"}
+	} else if numReceived < numToGuess{
+		ch <- Msg{content: "greater"}
+	} else {
+		ch <- Msg{content: "winner"}
+		winner = true
+	}
+	defer turnSync.Done()
 	defer wg.Done()
 }
 
 func spawnMyOracle(id string, max int, channels []chan Msg) {
-	num = generateRandom(max)
-	for i := 0; i < len(channels); i++ {
-		wg.Add(1)
-		go MyOracle(channels[i], id)
+	numToGuess = generateRandom(max)
+	for ; !winner ; {
+		turnSync.Add(len(channels))
+		for i := 0; i < len(channels); i++ {
+			wg.Add(1)
+			go MyOracle(channels[i], id)
+		}
+		turnSync.Wait()
+		for i := 0; i < len(channels); i++ {
+			if(winner){
+				channels[i] <- Msg{content: "close"}
+			} else {
+				channels[i] <- Msg{content: "continue"}
+			}
+		}
+		fmt.Println("Fine turno")
 	}
-	//fmt.Print("Ended")
 }
 
 func generateRandom(max int) int {
 	var num = rand.Intn(max + 1)
-	//fmt.Println(num)
+	fmt.Println("Il numero random da indovinare è: ", num)
 	return num
 }
