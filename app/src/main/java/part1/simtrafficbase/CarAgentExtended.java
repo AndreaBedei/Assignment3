@@ -35,8 +35,7 @@ public class CarAgentExtended extends CarAgent {
 		super(id, env, road, initialPos, acc, dec, vmax);
 		state = CarAgentState.STOPPED;
 	}
-	
-	
+
 	@Override
 	public void decide(int dt) {
 		switch (state) {

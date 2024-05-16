@@ -6,8 +6,6 @@
  */
 
 plugins {
-    scala
-
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
@@ -21,16 +19,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.scala-lang:scala3-compiler_3:3.4.0")
-    // This dependency is used by the application.
-    // This dependency is used by the application.
-    implementation("com.google.guava:guava:32.1.1-jre")
-
-    // Use Scalatest for testing our library
-    testImplementation("org.scalatest:scalatest_3:3.2.10")
-    testImplementation("org.scalatestplus:junit-4-13_3:3.2.10.0")
-    testRuntimeOnly("org.scala-lang.modules:scala-xml_3:2.0.1")
-
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Assginment 3 - Akka
