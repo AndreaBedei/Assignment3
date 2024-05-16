@@ -6,6 +6,8 @@
  */
 
 plugins {
+    scala
+
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
@@ -13,24 +15,29 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    maven {
+        url = uri("https://repo.akka.io/maven")
+    }
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation(libs.junit.jupiter)
+    implementation("org.scala-lang:scala3-compiler_3:3.4.0")
+    // This dependency is used by the application.
+    // This dependency is used by the application.
+    implementation("com.google.guava:guava:32.1.1-jre")
+
+    // Use Scalatest for testing our library
+    testImplementation("org.scalatest:scalatest_3:3.2.10")
+    testImplementation("org.scalatestplus:junit-4-13_3:3.2.10.0")
+    testRuntimeOnly("org.scala-lang.modules:scala-xml_3:2.0.1")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    // This dependency is used by the application.
-    implementation(libs.guava)
-   
-   	/* module 2.1 -- Vert.x */
-    implementation("io.vertx:vertx-core:4.5.7")
-    implementation("io.vertx:vertx-web:4.5.7")
-    implementation("io.vertx:vertx-web-client:4.5.7")
-       
-    /* module 2.2 -- RxJava */
-    implementation("io.reactivex.rxjava3:rxjava:3.1.8")   
+    // Assginment 3 - Akka
+    implementation(platform("com.typesafe.akka:akka-bom_2.13:2.9.3"))
+
+    implementation("com.typesafe.akka:akka-persistence-typed_2.13")
+    testImplementation("com.typesafe.akka:akka-persistence-testkit_2.13")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -43,9 +50,4 @@ java {
 application {
     // Define the main class for the application.
     mainClass = "org.example.App"
-}
-
-tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
 }
