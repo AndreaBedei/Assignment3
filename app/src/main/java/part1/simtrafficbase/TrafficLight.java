@@ -5,14 +5,16 @@ package part1.simtrafficbase;
  *  
  */
 public class TrafficLight {
-	
+
 	public static enum TrafficLightState {GREEN, YELLOW, RED}
+	private final String id;
 	private TrafficLightState state, initialState;
 	private int currentTimeInState;
 	private int redDuration, greenDuration, yellowDuration;
 	private P2d pos;
 	
-	public TrafficLight(P2d pos, TrafficLightState initialState, int greenDuration, int yellowDuration, int redDuration) {
+	public TrafficLight(String id, P2d pos, TrafficLightState initialState, int greenDuration, int yellowDuration, int redDuration) {
+		this.id = id;
 		this.redDuration = redDuration;
 		this.greenDuration = greenDuration;
 		this.yellowDuration = yellowDuration;
@@ -52,7 +54,15 @@ public class TrafficLight {
 			break;
 		}
 	}
-	
+
+	public String getId() {
+		return id;
+	}
+
+	public TrafficLightState getState() {
+		return state;
+	}
+
 	public boolean isGreen() {
 		return state.equals(TrafficLightState.GREEN);
 	}

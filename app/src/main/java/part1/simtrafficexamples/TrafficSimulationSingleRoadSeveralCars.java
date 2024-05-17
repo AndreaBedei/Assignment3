@@ -43,6 +43,8 @@ public class TrafficSimulationSingleRoadSeveralCars extends AbstractSimulation {
 
 		Random gen = new Random(super.getRandomSeed());
 
+		// FIXME: forse tutti gli attori andrebbero ricreati nel setup della simulazione?
+
 		for (int i = 0; i < nCars; i++) {
 			
 			String carId = "car-" + i;

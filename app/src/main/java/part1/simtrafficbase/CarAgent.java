@@ -35,7 +35,7 @@ public abstract class CarAgent extends AbstractAgent {
 		env.registerNewCar(this, road, initialPos);
 	}
 
-	public void senseAndDecide(int dt) {
+	public void senseAndDecide(int dt) {	// FIXME: togliere
 		AbstractEnvironment env = this.getEnv();		
 		currentPercept = (CarPercept) env.getCurrentPercepts(getId());			
 
@@ -44,7 +44,7 @@ public abstract class CarAgent extends AbstractAgent {
 		decide(dt);
 	}
 
-	public void act() {
+	public void act() {	// FIXME: togliere
 		if (selectedAction.isPresent()) {
 			this.getEnv().doAction(getId(), selectedAction.get());
 		}
