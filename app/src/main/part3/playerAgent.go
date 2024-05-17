@@ -6,36 +6,42 @@ import (
 	"strconv"
 )
 
-func spawnMyPlayer(maxR int, ch chan Msg, i int) {
+func spawnMyPlayer(maxR int, ch chan Msg, i int, publiChannel chan Msg, resultChannel chan Msg) {
 	var id = i // Id del giocatore.
 	var max int = maxR
 	wg.Add(1) // Aggiungiamo un elemento al gruppo di attesa.
-	go guessNumber(ch, id, max) // Creiamo una go routine per indovinare il numero da parte del giocatore.
+	go guessNumber(ch, id, max, publiChannel, resultChannel) // Creiamo una go routine per indovinare il numero da parte del giocatore.
 }
 
-func guessNumber(ch chan Msg, id int, maxV int) {
-	var continueIter = true
+func guessNumber(ch chan Msg, id int, maxV int, publiChan chan Msg, resultChannel chan Msg) {
 	var min int = 0
 	var max int = maxV
-	for ; continueIter ;  { // Continuo finchè qualcuno non ha indovinato.
-		message := <-ch // Aspetto il messaggio di inizio.
+	for (true) { // Continuo finchè qualcuno non ha indovinato.
+		message := <-publiChan // Aspetto il messaggio di inizio.
 		if message.content == "Start" { 
 			var num = rand.Intn(max-min+1) + min // Aggiorno il range ad ogni iterazione.
-			ch <- Msg{content: strconv.Itoa(num)} // invio il numero random del tentativo.
-			message := <-ch // Attendo la risposta dall'oracolo.
+			resultChannel <- Msg{content: strconv.Itoa(num), id: id} // invio il numero random del tentativo sul canale pubblico per non determinismo.
+			message := <-ch // Attendo la risposta dall'oracolo dal canale privato.
 			if message.content == "lower"{
 				fmt.Println("Il player ", id, " ha tentato col numero: ", num, " ma esso è troppo alto!")
 				max = num - 1
 			} else if message.content == "greater"{
 				fmt.Println("Il player ", id, " ha tentato col numero: ", num, " ma esso è troppo basso!")
 				min = num + 1
-			} else {
+			} else if message.content == "winnerNotMe" { // Accade quando il numero è corretto ma è stato gestito dopo a un altro messaggio di vittoria.
+				fmt.Println("Il player ", id, " ha indovinato ma è arrivato dopo, quindi non ha vinto per poco :-(")
+			} else { // Messaggio di vittoria.
 				fmt.Println("Il player ", id, " ha indovinato! Col numero: ", num)
 			}
-			msg := <-ch // Attendiamo di sapere se continuare o fermarci dall'oracolo, nel caso qualcuno avesse indovinato.
-			if(msg.content == "close"){
-				continueIter = false // Dico di concludere la goRoutine.
+			ch <- Msg{content: "Finito turno", id: id} // Messaggio per la sincronizzazione per la fine di un turno.
+		} else if message.content == "finish"{
+			// Ultimo messaggio per concludere il gioco dichiarando chi ha vinto e chi ha perso.
+			if(message.id == id){
+				fmt.Println("L'utente ", id, " ha vinto!!!")
+			} else {
+				fmt.Println("L'utente ", id, " ha perso.")
 			}
+			break
 		}
 	}
 	defer wg.Done() // Segnalo il completamento.
