@@ -4,55 +4,56 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
-	"sync"
 )
 
 // Struttura dei messaggi che inviamo.
 type Msg struct {
 	content  string
+	id int // Id del processo.
 }
 
-var numToGuess int // Numero comune da indovinare, generato random.
-var winner bool = false // Controlliamo se c'è un vincitore nel turno appena passato.
-var turnSync sync.WaitGroup // Creiamo il concetto di attesa per turno.
-
-// Per ciascun giocatore presente.
-func MyOracle(ch chan Msg, id string) {
-	ch <- Msg{content: "Start"} // Inviamo il messaggio che il giocatore può iniziare a giocare.
-	attempt := <-ch // Attendiamo che il giocatore ci invii il numero proposto.
-	numReceived, err := strconv.Atoi(attempt.content) // Lo convertiamo.
-	if err != nil {
-        fmt.Println("Errore durante la conversione della stringa in intero:", err)
-        return
-    }
-	// In base al numero gli indichiamo se è basso, alto o è quello indovinato.
-	if numReceived > numToGuess {
-		ch <- Msg{content: "lower"}
-	} else if numReceived < numToGuess{
-		ch <- Msg{content: "greater"}
-	} else {
-		ch <- Msg{content: "winner"}
-		winner = true // Impostiamo il flag al fine di comunicarlo ai giocatori.
-	}
-	defer turnSync.Done() // Diciamo che la seguente go routine è stata completata.
-}
-
-func spawnMyOracle(id string, max int, channels []chan Msg) {
+func spawnMyOracle(max int, channels []chan Msg, channelPublic chan Msg, resultChannel chan Msg) {
+	var numToGuess int // Numero comune da indovinare, generato random.
+	var winner bool = false // Controlliamo se c'è un vincitore nel turno appena passato.
+	var winnerId int
 	numToGuess = generateRandom(max) // Generiamo il numero random.
-	for ; !winner ; { // Continuiamo fino a che non c'è un vincitore.
-		turnSync.Add(len(channels)) // Aggiungiamo n elementi al gruppo di attesa quanti sono i palyer per gestire i turni.
+	for (!winner) { // Continuiamo fino a che non c'è un vincitore.
+		// Diciamo a tutti i giocatori che possono iniziare a giocare
 		for i := 0; i < len(channels); i++ {
-			go MyOracle(channels[i], id) // Mettiamo l'oracolo in ascolto per ciascun player che gioca in una go routine.
+			channelPublic <- Msg{content: "Start", id: -1}
 		}
-		turnSync.Wait() // Aspettiamo che tutti i player abbiano giocato.
+		// Gestiamo i messaggi dei numeri proposti, per ciascun player.
 		for i := 0; i < len(channels); i++ {
-			if(winner){ // Se nel turno c'è stato un vincitore lo comunichiamo a tutti.
-				channels[i] <- Msg{content: "close"} // Messaggio di chiusura.
+			attempt := <-resultChannel // Attendiamo che un giocatore ci invii il numero proposto sul canale pubblico.
+			numReceived, err := strconv.Atoi(attempt.content) // Lo convertiamo.
+			if err != nil {
+				fmt.Println("Errore durante la conversione della stringa in intero:", err)
+				return
+			}
+			// In base al numero gli indichiamo se è basso, alto, è quello indovinato oppure ho indovinato ma in ritardo rispetto ad un altro.
+			if numReceived > numToGuess {
+				channels[attempt.id] <- Msg{content: "lower", id: -1}
+			} else if numReceived < numToGuess{
+				channels[attempt.id] <- Msg{content: "greater", id: -1}
+			} else if winner{
+				channels[attempt.id] <- Msg{content: "winnerNotMe", id: -1}
 			} else {
-				channels[i] <- Msg{content: "_"} // Messaggio di continuazione.
+				channels[attempt.id] <- Msg{content: "winner", id: -1}
+				winnerId = attempt.id
+				winner = true // Impostiamo il flag al fine di fare inviare il messaggio di fine.
 			}
 		}
-		fmt.Println("Fine del turno")
+		// Meccanismo di sincronizzazione per gestire i turni.
+		for i := 0; i < len(channels); i++ {
+			<-channels[i] // I messaggi di sincronizzazione sono sui canali privati.
+		}
+		fmt.Println("Fine di un turno.")
+	}
+	// Se c'è un vincitore lo diciamo a tutti i player che stampano il loro stato di vittoria o perdita e completano.
+	if winner{
+		for i := 0; i < len(channels); i++ {
+			channelPublic <- Msg{content: "finish", id: winnerId}
+		}
 	}
 }
 
