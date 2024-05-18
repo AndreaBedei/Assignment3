@@ -114,7 +114,7 @@ public class CarAgentExtended extends CarAgent {
 		if (sem.isEmpty() || sem.get().sem().isGreen()) {
 			return false;
 		} else {
-			double dist = sem.get().roadPos() - currentPercept.roadPos();
+			double dist = sem.get().getRoadPos() - currentPercept.roadPos();
 			return dist > 0 && dist < SEM_NEAR_DIST;
 		}
 	}

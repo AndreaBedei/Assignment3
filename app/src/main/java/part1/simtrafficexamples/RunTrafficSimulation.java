@@ -53,7 +53,7 @@ public class RunTrafficSimulation {
 			carActors.put(id, system.actorOf(Props.create(TrafficLightActor.class, tl, simParams.dt())));
 		}
 
-		var supervisor = system.actorOf(Props.create(SupervisorActor.class,
+		var supervisor = system.actorOf(Props.create(EnvironmentActor.class,
 				simulation, null, simParams, carActors, tlActors, carAgents, trafficLights, placeholderNumber, placeholderNumber, 100));
 
 		supervisor.tell(new Begin(), null);

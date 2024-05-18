@@ -12,11 +12,7 @@ import part1.simengineseq.AbstractAgent;
 import part1.simengineseq.AbstractEnvironment;
 import part1.simengineseq.AbstractSimulation;
 import part1.simengineseq.SimulationListener;
-import part1.simtrafficbase.CarAgentInfo;
-import part1.simtrafficbase.Road;
-import part1.simtrafficbase.RoadsEnv;
-import part1.simtrafficbase.TrafficLight;
-import part1.simtrafficbase.V2d;
+import part1.simtrafficbase.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -101,7 +97,7 @@ public class RoadSimView extends JFrame implements SimulationListener {
 	@Override
 	public void notifyStepDone(int t, List<AbstractAgent> agents, AbstractEnvironment env) {
 		var e = ((RoadsEnv) env);
-		panel.update(e.getRoads(), e.getAgentInfo(), e.getTrafficLights());
+		panel.update(e.getRoads(), e.getAgentInfo(), e.getTrafficLightsInfo());
 	}
 	
 	
@@ -109,7 +105,7 @@ public class RoadSimView extends JFrame implements SimulationListener {
 		
 		List<CarAgentInfo> cars;
 		List<Road> roads;
-		List<TrafficLight> sems;
+		List<TrafficLightInfo> sems;
 		
 		public RoadSimViewPanel(int w, int h){
 		}
@@ -124,21 +120,28 @@ public class RoadSimView extends JFrame implements SimulationListener {
 			if (roads != null) {
 				for (var r: roads) {
 					g2.drawLine((int)r.getFrom().x(), (int)r.getFrom().y(), (int)r.getTo().x(), (int)r.getTo().y());
-				}
-			}
-			
-			if (sems != null) {
-				for (var s: sems) {
-					if (s.isGreen()) {
-						g.setColor(new Color(0, 255, 0, 255));
-					} else if (s.isRed()) {
-						g.setColor(new Color(255, 0, 0, 255));
-					} else {
-						g.setColor(new Color(255, 255, 0, 255));
+
+					for (var s: r.getTrafficLightsInfo()) {
+						switch (s.getState()) {
+							case GREEN -> g.setColor(new Color(0, 255, 0, 255));
+							case RED -> g.setColor(new Color(255, 0, 0, 255));
+							case YELLOW -> g.setColor(new Color(255, 255, 0, 255));
+						}
+						double x, y;
+						if (r.getFrom().x() == r.getTo().x()) {
+							x = r.getFrom().x();
+							y = s.getRoadPos();
+						} else {
+							x = s.getRoadPos();
+							y = r.getFrom().y();
+						}
+
+						g2.fillRect((int)x, (int)y, 10, 10);
 					}
-					g2.fillRect((int)(s.getPos().x()-5), (int)(s.getPos().y()-5), 10, 10);
 				}
 			}
+
+			// TODO: rimuovere sems (non necessario)
 			
 			g.setColor(new Color(0, 0, 0, 255));
 
@@ -154,10 +157,10 @@ public class RoadSimView extends JFrame implements SimulationListener {
 	
 	   public void update(List<Road> roads, 
 			   			  List<CarAgentInfo> cars,
-			   			List<TrafficLight> sems) {
+			   			List<TrafficLightInfo> sems) {
 		   this.roads = roads;
 		   this.cars = cars;
-		   this.sems = sems;
+		   this.sems = sems; // TODO: togliere
 		   repaint();
 	   }
 	}

@@ -1,8 +1,8 @@
 package part1.simtrafficbase;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 public class Road {
@@ -10,13 +10,13 @@ public class Road {
 	private double len;
 	private P2d from;
 	private P2d to;
-	private List<TrafficLightInfo> trafficLights;
+	private final Map<String, TrafficLightInfo> trafficLightsInfo;
 
 	public Road(P2d from, P2d to) {
 		this.from = from;
 		this.to = to;
 		this.len = P2d.len(from, to);
-		trafficLights = new ArrayList<>();
+		trafficLightsInfo = new HashMap<>();
 	}
 	
 	public double getLen() {
@@ -31,11 +31,15 @@ public class Road {
 		return to;
 	}
 	
-	public void addTrafficLight(TrafficLight sem, double pos) {
-		trafficLights.add(new TrafficLightInfo(sem, this, pos));
+	public void addTrafficLight(TrafficLightInfo tlInfo) {
+		trafficLightsInfo.put(tlInfo.getTlId(), tlInfo);
+	}
+
+	public void updateTLState(String tlId, TrafficLight.TrafficLightState tlState) {
+		trafficLightsInfo.get(tlId).updateState(tlState);
 	}
 	
-	public List<TrafficLightInfo> getTrafficLights(){
-		return trafficLights;
+	public List<TrafficLightInfo> getTrafficLightsInfo(){
+		return trafficLightsInfo.values().stream().toList();
 	}
 }

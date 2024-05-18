@@ -1,13 +1,10 @@
 package part1.simtrafficbase;
 
-public  class CarAgentInfo {
-
-	private CarAgent car;
+public class CarAgentInfo {
 	private double pos;
 	private Road road;
 	
-	public CarAgentInfo(CarAgent car, Road road, double pos) {
-		this.car = car;
+	public CarAgentInfo(Road road, double pos) {
 		this.road = road;
 		this.pos = pos;
 	}
@@ -19,11 +16,7 @@ public  class CarAgentInfo {
 	public void updatePos(double pos) {
 		this.pos = pos;
 	}
-	
-	public CarAgent getCar() {
-		return car;
-	}	
-	
+
 	public Road getRoad() {
 		return road;
 	}
