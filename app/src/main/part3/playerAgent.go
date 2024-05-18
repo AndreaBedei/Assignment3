@@ -13,15 +13,15 @@ func spawnMyPlayer(maxR int, ch chan Msg, i int, publiChannel chan Msg, resultCh
 	go guessNumber(ch, id, max, publiChannel, resultChannel) // Creiamo una go routine per indovinare il numero da parte del giocatore.
 }
 
-func guessNumber(ch chan Msg, id int, maxV int, publiChan chan Msg, resultChannel chan Msg) {
+func guessNumber(syncChannel chan Msg, id int, maxV int, channelPublic chan Msg, sendResultChannel chan Msg) {
 	var min int = 0
 	var max int = maxV
 	for (true) { // Continuo finchè qualcuno non ha indovinato.
-		message := <-publiChan // Aspetto il messaggio di inizio.
+		message := <-channelPublic // Aspetto il messaggio di inizio.
 		if message.content == "Start" { 
 			var num = rand.Intn(max-min+1) + min // Aggiorno il range ad ogni iterazione.
-			resultChannel <- Msg{content: strconv.Itoa(num), id: id} // invio il numero random del tentativo sul canale pubblico per non determinismo.
-			message := <-ch // Attendo la risposta dall'oracolo dal canale privato.
+			sendResultChannel <- Msg{content: strconv.Itoa(num), id: id} // invio il numero random del tentativo sul canale pubblico per non determinismo.
+			message := <-channelPublic // Attendo la risposta dall'oracolo.
 			if message.content == "lower"{
 				fmt.Println("Il player ", id, " ha tentato col numero: ", num, " ma esso è troppo alto!")
 				max = num - 1
@@ -33,7 +33,7 @@ func guessNumber(ch chan Msg, id int, maxV int, publiChan chan Msg, resultChanne
 			} else { // Messaggio di vittoria.
 				fmt.Println("Il player ", id, " ha indovinato! Col numero: ", num)
 			}
-			ch <- Msg{content: "Finito turno", id: id} // Messaggio per la sincronizzazione per la fine di un turno.
+			syncChannel <- Msg{content: "Finito turno", id: id} // Messaggio per la sincronizzazione per la fine di un turno.
 		} else if message.content == "finish"{
 			// Ultimo messaggio per concludere il gioco dichiarando chi ha vinto e chi ha perso.
 			if(message.id == id){
