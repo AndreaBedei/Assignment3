@@ -2,6 +2,8 @@ package part1.simtrafficbase;
 
 import java.util.Optional;
 
+import static part1.simtrafficbase.TrafficLight.TrafficLightState.GREEN;
+
 /**
  * 
  * Extended Car behaviour, considering near cars and semaphores
@@ -98,7 +100,7 @@ public class CarAgentExtended extends CarAgent {
 		}
 
 	}
-		
+
 	private boolean detectedNearCar() {
 		Optional<CarAgentInfo> car = currentPercept.nearestCarInFront();
 		if (car.isEmpty()) {
@@ -111,7 +113,7 @@ public class CarAgentExtended extends CarAgent {
 	
 	private boolean detectedRedOrOrangeSemNear() {
 		Optional<TrafficLightInfo> sem = currentPercept.nearestSem();
-		if (sem.isEmpty() || sem.get().sem().isGreen()) {
+		if (sem.isEmpty() || sem.get().is(GREEN)) {
 			return false;
 		} else {
 			double dist = sem.get().getRoadPos() - currentPercept.roadPos();
@@ -121,7 +123,7 @@ public class CarAgentExtended extends CarAgent {
 
 	private boolean detectedGreenSem() {
 		Optional<TrafficLightInfo> sem = currentPercept.nearestSem();
-		return (!sem.isEmpty() && sem.get().sem().isGreen());
+		return (sem.isPresent() && sem.get().is(GREEN));
 	}
 	
 	private boolean carFarEnough() {

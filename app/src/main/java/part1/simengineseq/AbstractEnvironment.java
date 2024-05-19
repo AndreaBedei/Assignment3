@@ -77,6 +77,7 @@ public abstract class AbstractEnvironment {
 	 * 
 	 * @param agentId - identifier of the agent doing the action
 	 * @param act - the action
+	 * @return the new position
 	 */
-	public abstract void doAction(String agentId, Action act);
+	public abstract double doAction(String agentId, Action act);
 }

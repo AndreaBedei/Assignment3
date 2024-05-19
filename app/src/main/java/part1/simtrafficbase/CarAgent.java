@@ -12,8 +12,9 @@ import part1.simengineseq.*;
 public abstract class CarAgent extends AbstractAgent {
 	
 	/* car model */
-	protected double maxSpeed;		
-	protected double currentSpeed;  
+	protected double pos;
+	protected double maxSpeed;
+	protected double currentSpeed;
 	protected double acceleration;
 	protected double deceleration;
 
@@ -21,43 +22,30 @@ public abstract class CarAgent extends AbstractAgent {
 	protected CarPercept currentPercept;
 	protected Optional<Action> selectedAction;
 
-	
-	
 	public CarAgent(String id, RoadsEnv env, Road road, 
 			double initialPos, 
 			double acc, 
 			double dec,
 			double vmax) {
 		super(id);
+		this.pos = initialPos;
 		this.acceleration = acc;
 		this.deceleration = dec;
 		this.maxSpeed = vmax;
-		env.registerNewCar(this, road, initialPos);
 	}
 
-	public void senseAndDecide(int dt) {	// FIXME: togliere
-		AbstractEnvironment env = this.getEnv();		
-		currentPercept = (CarPercept) env.getCurrentPercepts(getId());			
-
-		/* decide */
-		selectedAction = Optional.empty();
-		decide(dt);
+	public void setCurrentPercept(CarPercept percept) {
+		this.currentPercept = percept;
 	}
 
-	public void act() {	// FIXME: togliere
-		if (selectedAction.isPresent()) {
-			this.getEnv().doAction(getId(), selectedAction.get());
-		}
+	public double getPos() {
+		return pos;
 	}
 
-	/**
-	 * 
-	 * Base method to define the behaviour strategy of the car
-	 * 
-	 * @param dt
-	 */
-	protected abstract void decide(int dt);
-	
+	public void updatePos(double pos) {
+		this.pos = pos;
+	}
+
 	public double getCurrentSpeed() {
 		return currentSpeed;
 	}

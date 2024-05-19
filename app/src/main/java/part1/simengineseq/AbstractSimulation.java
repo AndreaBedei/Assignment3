@@ -28,6 +28,8 @@ public abstract class AbstractSimulation {
 	/* initial logical time */
 	private int t0;
 
+	private int t;
+
 	/* in the case of sync with wall-time */
 	private boolean toBeInSyncWithWallTime;
 	private int nStepsPerSec;
@@ -36,6 +38,7 @@ public abstract class AbstractSimulation {
 	private long currentWallTime;
 	private long startWallTime;
 	private long endWallTime;
+
 	private long averageTimePerStep;
 
 	// New field that changes when the stop button is pressed.
@@ -73,7 +76,7 @@ public abstract class AbstractSimulation {
 		startWallTime = System.currentTimeMillis();
 
 		/* initialize the env and the agents inside */
-		int t = t0;
+		this.t = t0;
 
 		env.setnSteps(numSteps);
 		env.init();
@@ -139,7 +142,7 @@ public abstract class AbstractSimulation {
 		return state;
 	}
 
-	public void stop(){
+	public void stop(){	 // TODO: togliere monitor
 		// We use the monitor for correct writing the shared variable.
 		this.stopMonitor.requestWrite();
 		this.stopRequested = true;
@@ -156,5 +159,28 @@ public abstract class AbstractSimulation {
 
 	public int getRandomSeed(){
 		return this.randomSeed;
+	}
+
+	// TODO: metodi per syncWithWallType (startCycle(), endCycleAndSync())
+	public void startCycle() {
+		currentWallTime = System.currentTimeMillis();
+	}
+	public void endCycleAndWait() {
+		this.t += this.dt;
+		notifySimulationStep(this.t);
+		if(nStepsPerSec>0 ){
+			syncWithWallTime();
+		}
+	}
+
+	private void syncWithWallTime() {
+		try {
+			long newWallTime = System.currentTimeMillis();
+			long delay = 1000 / this.nStepsPerSec;
+			long wallTimeDT = newWallTime - this.currentWallTime;
+			if (wallTimeDT < delay) {
+				Thread.sleep(delay - wallTimeDT);
+			}
+		} catch (Exception ex) {}
 	}
 }

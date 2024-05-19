@@ -25,6 +25,10 @@ public class TrafficLightInfo {
         return roadPos;
     }
 
+    public boolean is(TrafficLight.TrafficLightState state) {
+        return this.tlState == state;
+    }
+
     public TrafficLight.TrafficLightState getState() {
         return tlState;
     }

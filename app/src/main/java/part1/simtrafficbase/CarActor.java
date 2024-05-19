@@ -1,6 +1,7 @@
 package part1.simtrafficbase;
 
 import akka.actor.AbstractActor;
+import akka.actor.Props;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.Behaviors;
 import part1.simtrafficbase.CarAgent;
@@ -22,8 +23,13 @@ public class CarActor extends AbstractActor {
                 sender().tell(new GetCurrentPercept(this.carAgent.getId()), getSelf());
             })
             .match(CurrentPercept.class, msg -> {
+                this.carAgent.setCurrentPercept(msg.currentPercept());
+                this.carAgent.decide(this.dt);
                 this.carAgent.decide(this.dt);
                 sender().tell(new CarAction(this.carAgent.getId(), this.carAgent.selectedAction), getSelf());
+            })
+            .match(NewCarPosition.class, msg -> {
+                this.carAgent.updatePos(msg.pos());
             })
             .build();
     }

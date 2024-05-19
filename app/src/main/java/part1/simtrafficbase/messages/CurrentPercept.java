@@ -1,6 +1,5 @@
 package part1.simtrafficbase.messages;
 
-import akka.actor.typed.ActorRef;
-import part1.simengineseq.Percept;
+import part1.simtrafficbase.CarPercept;
 
-public record CurrentPercept(Percept currentPercept) implements SimulationMessage {}
+public record CurrentPercept(CarPercept currentPercept) implements SimulationMessage {}

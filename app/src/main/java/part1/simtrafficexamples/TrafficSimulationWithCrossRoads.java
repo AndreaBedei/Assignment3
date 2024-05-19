@@ -7,7 +7,6 @@ import java.util.Random;
 import part1.simengineseq.AbstractSimulation;
 import part1.simtrafficbase.CarAgent;
 import part1.simtrafficbase.CarAgentExtended;
-import part1.simtrafficbase.SimThreadsSupervisor;
 import part1.simtrafficbase.P2d;
 import part1.simtrafficbase.Road;
 import part1.simtrafficbase.RoadsEnv;
@@ -15,12 +14,9 @@ import part1.simtrafficbase.TrafficLight;
 
 public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 
-	private final SimThreadsSupervisor supervisor;
-
 
 	public TrafficSimulationWithCrossRoads(int nThreads, boolean isRandom) {
 		super(isRandom);
-		this.supervisor = new SimThreadsSupervisor(nThreads, this);
 	}
 	
 	public void setup() {
@@ -29,7 +25,7 @@ public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 		
 		this.setupTimings(0, 1);
 				
-		TrafficLight tl1 = env.createTrafficLight(new P2d(740,300), TrafficLight.TrafficLightState.GREEN, 75, 25, 100);
+		/*TrafficLight tl1 = env.createTrafficLight(new P2d(740,300), TrafficLight.TrafficLightState.GREEN, 75, 25, 100);
 		
 		Road r1 = env.createRoad(new P2d(0,300), new P2d(1500,300));
 		r1.addTrafficLight(tl1, 740);
@@ -97,35 +93,27 @@ public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 		cars.add(car4);
 
 		lights.add(tl1);
-		lights.add(tl2);
-
-		supervisor.createCars(cars);
-		supervisor.createTrafficLights(lights);
+		lights.add(tl2);*/
 
 		this.syncWithTime(25);
 	}	
 	
 	@Override
 	public void run(int nSteps) {
-		this.supervisor.setSteps(nSteps);
 		super.run(nSteps);
-		this.supervisor.runAllThreads();
 	}
 
 	@Override
 	protected void setupTimings(int t0, int dt) {
 		super.setupTimings(t0, dt);
-		this.supervisor.setTimings(t0, dt);
 	}
 
 	@Override
 	protected void syncWithTime(int nCyclesPerSec) {
 		super.syncWithTime(nCyclesPerSec);
-		this.supervisor.setStepsPerSec(nCyclesPerSec);
 	}
 
 	protected void setupEnvironment(RoadsEnv env) {
 		super.setupEnvironment(env);
-		this.supervisor.setEnvironment(env);
 	}
 }

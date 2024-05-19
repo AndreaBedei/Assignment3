@@ -6,7 +6,7 @@ package part1.simtrafficbase;
  */
 public class TrafficLight {
 
-	public static enum TrafficLightState {GREEN, YELLOW, RED}
+	public enum TrafficLightState {GREEN, YELLOW, RED}
 	private final String id;
 	private TrafficLightState state, initialState;
 	private int currentTimeInState;

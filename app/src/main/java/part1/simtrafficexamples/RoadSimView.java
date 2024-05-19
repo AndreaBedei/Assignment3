@@ -123,9 +123,9 @@ public class RoadSimView extends JFrame implements SimulationListener {
 
 					for (var s: r.getTrafficLightsInfo()) {
 						switch (s.getState()) {
-							case GREEN -> g.setColor(new Color(0, 255, 0, 255));
 							case RED -> g.setColor(new Color(255, 0, 0, 255));
 							case YELLOW -> g.setColor(new Color(255, 255, 0, 255));
+							case GREEN -> g.setColor(new Color(0, 255, 0, 255));
 						}
 						double x, y;
 						if (r.getFrom().x() == r.getTo().x()) {

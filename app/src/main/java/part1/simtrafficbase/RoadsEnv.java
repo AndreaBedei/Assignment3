@@ -21,7 +21,9 @@ public class RoadsEnv extends AbstractEnvironment {
 	 */
 	private HashMap<String, Road> registeredTrafficLights;
 	
-	/* cars situated in the environment */	
+	/**
+	 *  Cars situated in the environment.
+	 */
 	private HashMap<String, CarAgentInfo> registeredCars;
 
 	private AbstractSimulation simulation;
@@ -97,35 +99,44 @@ public class RoadsEnv extends AbstractEnvironment {
 	}
 	
 	@Override
-	public void doAction(String agentId, Action act) {
+	public double doAction(String agentId, Action act) {
+		double newPos = 0;
 		switch (act) {
 		case MoveForward mv: {
 			CarAgentInfo info = registeredCars.get(agentId);
 			Road road = info.getRoad();
 			double pos = info.getPos();
+			newPos = pos;
 			Optional<CarAgentInfo> nearestCar = getNearestCarInFront(road, pos, CAR_DETECTION_RANGE);
 
 			if (nearestCar.isPresent()) {
 				double dist = nearestCar.get().getPos() - pos;
 				if (dist > mv.distance() + MIN_DIST_ALLOWED) {
-					info.updatePos(pos + mv.distance());
+					newPos = pos + mv.distance();
 				}
 			} else {
-				info.updatePos(pos + mv.distance());
+				newPos = pos + mv.distance();
 			}
 
 			if (info.getPos() > road.getLen()) { // Account for updated position.
-				info.updatePos(0);
+				newPos = 0;
 			}
-			break;
+
+			info.updatePos(newPos);
 		}
 		default: break;
 		}
+
+		return newPos;
 	}
 	
 	
 	public List<CarAgentInfo> getAgentInfo(){
 		return this.registeredCars.values().stream().toList();
+	}
+
+	public int numOfCars(){
+		return this.registeredCars.size();
 	}
 
 	public List<Road> getRoads(){
@@ -137,5 +148,12 @@ public class RoadsEnv extends AbstractEnvironment {
 				.stream()
 				.flatMap(r -> r.getTrafficLightsInfo().stream())
 				.toList();
+	}
+
+	public int numOfTrafficLights(){
+		return this.getRoads()
+				.stream()
+				.mapToInt(r -> r.getTrafficLightsInfo().size())
+				.sum();
 	}
 }

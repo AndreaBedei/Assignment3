@@ -27,10 +27,8 @@ public abstract class AbstractAgent {
 	public void init(AbstractEnvironment env) {
 		this.env = env;
 	}
-	
-	abstract public void senseAndDecide(int dt);
-	
-	abstract public void act();
+
+	public abstract void decide(int dt);
 	
 
 	public String getId() {

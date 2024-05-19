@@ -34,14 +34,13 @@ public class CarAgentBasic extends CarAgent {
 		super(id, env, road, initialPos, acc, dec, vmax);
 		state = CarAgentState.STOPPED;
 	}
-	
 
 	/**
 	 * 
 	 * Behaviour defined by a simple finite state machine 
 	 *
 	 */
-	protected void decide(int dt) {
+	public void decide(int dt) {
 		switch (state) {
 		case CarAgentState.STOPPED:
 			if (!detectedNearCar()) {

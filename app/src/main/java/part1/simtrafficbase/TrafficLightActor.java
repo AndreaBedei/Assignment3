@@ -9,6 +9,7 @@ public class TrafficLightActor extends AbstractActor {
 
     public TrafficLightActor(TrafficLight trafficLight, int dt) {
         this.trafficLight = trafficLight;
+        this.trafficLight.init();
         this.dt = dt;
     }
 
@@ -16,7 +17,6 @@ public class TrafficLightActor extends AbstractActor {
     public AbstractActor.Receive createReceive() {
         return receiveBuilder()
                 .match(Step.class, msg -> {
-                    sender().tell(new GetCurrentPercept(this.trafficLight.getId()), getSelf());
                     this.trafficLight.step(this.dt);
                     sender().tell(new TLAction(this.trafficLight.getId(), this.trafficLight.getState()), getSelf());
                 })
