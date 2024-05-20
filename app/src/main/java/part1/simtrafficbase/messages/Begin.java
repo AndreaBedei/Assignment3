@@ -1,3 +1,3 @@
 package part1.simtrafficbase.messages;
 
-public record Begin() {}
+public record Begin() implements SimulationMessage {}
