@@ -35,7 +35,6 @@ public class CarActor extends AbstractBehavior<SimulationMessage> {
             .onMessage(CurrentPercept.class, msg -> {
                 this.carAgent.setCurrentPercept(msg.currentPercept());
                 this.carAgent.decide(this.dt);
-                this.carAgent.decide(this.dt);
                 msg.sender().tell(new CarAction(this.carAgent.getId(), this.carAgent.selectedAction, getContext().getSelf().narrow()));
                 return this;
             })

@@ -119,6 +119,7 @@ public class RoadSimView extends JFrame implements SimulationListener {
 			
 			if (roads != null) {
 				for (var r: roads) {
+					g2.setColor(new Color(0, 0, 0, 255));
 					g2.drawLine((int)r.getFrom().x(), (int)r.getFrom().y(), (int)r.getTo().x(), (int)r.getTo().y());
 
 					for (var s: r.getTrafficLightsInfo()) {
@@ -136,7 +137,7 @@ public class RoadSimView extends JFrame implements SimulationListener {
 							y = r.getFrom().y();
 						}
 
-						g2.fillRect((int)x, (int)y, 10, 10);
+						g2.fillRect((int)x - 5, (int)y - 5, 10, 10);
 					}
 				}
 			}

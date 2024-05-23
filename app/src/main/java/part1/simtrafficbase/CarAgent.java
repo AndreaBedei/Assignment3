@@ -20,7 +20,7 @@ public abstract class CarAgent extends AbstractAgent {
 
 	/* percept and action retrieved and submitted at each step */
 	protected CarPercept currentPercept;
-	protected Optional<Action> selectedAction;
+	protected Action selectedAction;
 
 	public CarAgent(String id, RoadsEnv env, Road road, 
 			double initialPos, 

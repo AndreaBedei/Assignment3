@@ -22,7 +22,9 @@ public class TrafficSimulationSingleRoadSeveralCars extends AbstractSimulation {
 	public TrafficSimulationSingleRoadSeveralCars(int nThreads, boolean isRandom) {
 		super(isRandom);
 	}
-	
+
+	// TODO: resto delle simulazioni ad attori
+
 	public void setup() {
 
 		RoadsEnv env = new RoadsEnv(this);

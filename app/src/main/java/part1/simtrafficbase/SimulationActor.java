@@ -58,7 +58,7 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
                     return this;
                 })
                 .onMessage(TLAction.class, msg -> {
-                    System.out.println("Received tl action");
+//                    System.out.println("Received tl action");
                     this.env.updateTlState(msg.id(), msg.state());
                     if (++tlStepsReceived == tlActors.size()) {
                         tlStepsReceived = 0;
@@ -71,16 +71,16 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
                     return this;
                 })
                 .onMessage(CarAction.class, msg -> {
-                    System.out.println("Received car action");
+//                    System.out.println("Received car action");
 
-                    if (msg.action().isPresent()) {
-                        double newPos = this.env.doAction(msg.id(), msg.action().get());
+                    if (msg.action() != null) {
+                        double newPos = this.env.doAction(msg.id(), msg.action());
                         msg.sender().tell(new NewCarPosition(newPos));
                     }
 
                     if (++carStepsReceived == carActors.size()) {
                         carStepsReceived = 0;
-                        System.out.println("RECEIVED ALL CAR ACTIONS");
+//                        System.out.println("RECEIVED ALL CAR ACTIONS");
                         stepsDone++;
                         sim.endCycleAndWait();
 
