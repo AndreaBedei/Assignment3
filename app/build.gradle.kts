@@ -25,6 +25,7 @@ dependencies {
     implementation(platform("com.typesafe.akka:akka-bom_2.13:2.9.3"))
 
     implementation("com.typesafe.akka:akka-persistence-typed_2.13")
+    implementation("ch.qos.logback:logback-classic:1.4.12")
     testImplementation("com.typesafe.akka:akka-persistence-testkit_2.13")
 }
 
