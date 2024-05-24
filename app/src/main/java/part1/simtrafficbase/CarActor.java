@@ -1,16 +1,13 @@
 package part1.simtrafficbase;
 
-import akka.actor.AbstractActor;
-import akka.actor.Props;
-import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-import part1.simtrafficbase.CarAgent;
 import part1.simtrafficbase.messages.*;
 
+// E' l'attore che gestisce i messaggi, in base al messaggio manipola un CarAgent (singola macchina).
 public class CarActor extends AbstractBehavior<SimulationMessage> {
     private final CarAgent carAgent;
     private final int dt;
@@ -29,12 +26,14 @@ public class CarActor extends AbstractBehavior<SimulationMessage> {
     public Receive<SimulationMessage> createReceive() {
         return newReceiveBuilder()
             .onMessage(Step.class, msg -> {
+                // Quando l'attore della macchinina riceve il messaggio Step, richiede all'ambiente la percezione.
                 msg.sender().tell(new GetCurrentPercept(this.carAgent.getId(), getContext().getSelf().narrow()));
                 return this;
             })
             .onMessage(CurrentPercept.class, msg -> {
                 this.carAgent.setCurrentPercept(msg.currentPercept());
                 this.carAgent.decide(this.dt);
+                // Risponde con l'azione che vuole fare in base alla percezione ricevuta.
                 msg.sender().tell(new CarAction(this.carAgent.getId(), this.carAgent.selectedAction, getContext().getSelf().narrow()));
                 return this;
             })

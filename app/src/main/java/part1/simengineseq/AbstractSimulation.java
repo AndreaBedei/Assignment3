@@ -3,11 +3,7 @@ package part1.simengineseq;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-
-import part1.simtrafficbase.StopMonitor;
 
 
 /**
@@ -18,9 +14,9 @@ public abstract class AbstractSimulation {
 
 	/* environment of the simulation */
 	private AbstractEnvironment env;
-		
+
 	/* list of the agents */
-	private List<AbstractAgent> agents;
+	private List<AbstractAgent> agents; // Non usato.
 		
 	/* simulation listeners */
 	private List<SimulationListener> listeners;
@@ -42,9 +38,6 @@ public abstract class AbstractSimulation {
 	private long startWallTime;
 	private long endWallTime;
 
-	// New field that changes when the stop button is pressed.
-	private volatile Boolean stopRequested = false;
-	private StopMonitor stopMonitor = new StopMonitor();	// Monitor useful for stopping the simulation without race condition.
 
 	private boolean isRandom;	// Specifies if the simulation should include randomness.
 
@@ -72,9 +65,6 @@ public abstract class AbstractSimulation {
 	 * @param numSteps
 	 */
 	public void run(int numSteps) {
-
-		this.stopRequested = false;	// Shared variable.
-
 		startWallTime = System.currentTimeMillis();
 
 		/* initialize the env and the agents inside */
@@ -82,7 +72,6 @@ public abstract class AbstractSimulation {
 
 		env.setnSteps(numSteps);
 		env.init();
-		
 
 		this.notifyReset(t, agents, env);
 	}
@@ -109,11 +98,6 @@ public abstract class AbstractSimulation {
 		this.env = env;
 	}
 
-	protected void addAgent(AbstractAgent agent) {
-		agents.add(agent);
-	}
-	
-	/* methods for listeners */
 	
 	public void addSimulationListener(SimulationListener l) {
 		this.listeners.add(l);
@@ -131,11 +115,7 @@ public abstract class AbstractSimulation {
 		}
 	}
 
-	public boolean isStopped(){
-		return this.stopRequested;
-	}
-
-	public void stop(){	 // TODO: togliere monitor
+	public void stop(){
 		this.endWallTime = System.currentTimeMillis();
 		if(onComplete != null){
 			this.onComplete.accept(this.getSimulationDuration());
@@ -154,7 +134,6 @@ public abstract class AbstractSimulation {
 		return this.randomSeed;
 	}
 
-	// TODO: metodi per syncWithWallType (startCycle(), endCycleAndSync())
 	public void startCycle() {
 		currentWallTime = System.currentTimeMillis();
 	}
@@ -178,6 +157,7 @@ public abstract class AbstractSimulation {
 		} catch (Exception ex) {}
 	}
 
+	// Ci serve come callback quando la simulazione finisce per far vedere i dati della simulazione.
 	public void onSimulationCompleted(Consumer<Long> onComplete) {
 		this.onComplete = onComplete;
 	}

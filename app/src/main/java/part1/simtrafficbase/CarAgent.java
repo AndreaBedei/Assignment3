@@ -49,10 +49,4 @@ public abstract class CarAgent extends AbstractAgent {
 	public double getCurrentSpeed() {
 		return currentSpeed;
 	}
-	
-	protected void log(String msg) {
-		System.out.println("[CAR " + this.getId() + "] " + msg);
-	}
-
-	
 }

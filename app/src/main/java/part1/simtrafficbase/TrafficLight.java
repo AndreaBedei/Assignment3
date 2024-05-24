@@ -62,20 +62,4 @@ public class TrafficLight {
 	public TrafficLightState getState() {
 		return state;
 	}
-
-	public boolean isGreen() {
-		return state.equals(TrafficLightState.GREEN);
-	}
-	
-	public boolean isRed() {
-		return state.equals(TrafficLightState.RED);
-	}
-
-	public boolean isYellow() {
-		return state.equals(TrafficLightState.YELLOW);
-	}
-	
-	public P2d getPos() {
-		return pos;
-	}
 }

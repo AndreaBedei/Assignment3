@@ -39,10 +39,6 @@ public abstract class AbstractEnvironment {
 		this.nSteps = nSteps;
 	}
 
-	
-	public int getCyclesPerSec() {
-		return nCyclesPerSec;
-	}
 
 	public void setCyclesPerSec(int nCyclesPerSec) {
 		this.nCyclesPerSec = nCyclesPerSec;

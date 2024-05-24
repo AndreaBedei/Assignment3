@@ -142,7 +142,6 @@ public class RoadSimView extends JFrame implements SimulationListener {
 				}
 			}
 
-			// TODO: rimuovere sems (non necessario)
 			
 			g.setColor(new Color(0, 0, 0, 255));
 
@@ -161,7 +160,7 @@ public class RoadSimView extends JFrame implements SimulationListener {
 			   			List<TrafficLightInfo> sems) {
 		   this.roads = roads;
 		   this.cars = cars;
-		   this.sems = sems; // TODO: togliere
+		   this.sems = sems;
 		   repaint();
 	   }
 	}
