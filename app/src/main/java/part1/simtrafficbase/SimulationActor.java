@@ -38,14 +38,14 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
     public Receive<SimulationMessage> createReceive() {
         return newReceiveBuilder()
                 .onMessage(SpawnCar.class, msg -> {
-                    System.out.println("Registering car...");
+//                    System.out.println("Registering car...");
                     var actor = getContext().spawn(CarActor.create(msg.car(), msg.dt()), msg.car().getId());
                     this.carActors.add(actor);
                     this.env.registerNewCar(msg.car().getId(), msg.roadNum(), msg.car().getPos());
                     return this;
                 })
                 .onMessage(SpawnTL.class, msg -> {
-                    System.out.println("Registering tl...");
+//                    System.out.println("Registering tl...");
                     var actor = getContext().spawn(TrafficLightActor.create(msg.tl(), msg.dt()), msg.tl().getId());
                     this.tlActors.add(actor);
                     this.env.registerNewTL(msg.tl().getId(), msg.roadNum(), msg.pos(), msg.tl().getState());
@@ -54,7 +54,11 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
                 .onMessage(Begin.class, msg -> {
                     System.out.println("Beginning simulation...");
                     sim.startCycle();
-                    this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                    if (this.tlActors.isEmpty()) {
+                        this.carActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                    } else {
+                        this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                    }
                     return this;
                 })
                 .onMessage(TLAction.class, msg -> {
@@ -71,7 +75,7 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
                     return this;
                 })
                 .onMessage(CarAction.class, msg -> {
-//                    System.out.println("Received car action");
+//                    System.out.print(".");
 
                     if (msg.action() != null) {
                         double newPos = this.env.doAction(msg.id(), msg.action());
@@ -86,15 +90,21 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
 
                         if (stepsDone == env.getnSteps()) {
                             this.sim.stop();
+                            getContext().getSelf().tell(new Stop());
                         } else {
+//                            System.out.print("|");
                             sim.startCycle();
-                            this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                            if (this.tlActors.isEmpty()) {
+                                this.carActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                            } else {
+                                this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                            }
                         }
                     }
                     return this;
                 })
                 .onMessage(Stop.class, msg -> {
-                    System.out.println("Stopping...");
+                    System.out.println("\nStopping...");
                     tlActors.forEach(act -> act.tell(new Stop()));
                     carActors.forEach(act -> act.tell(new Stop()));
                     return Behaviors.stopped();

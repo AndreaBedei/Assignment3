@@ -50,7 +50,7 @@ public class RoadSimStatistics implements SimulationListener {
 		if (!agents.isEmpty()) {
 			avSpeed /= agents.size();
 		}
-		log("average speed: " + avSpeed);
+		//log("average speed: " + avSpeed);
 	}
 	
 	public double getAverageSpeed() {
@@ -67,7 +67,7 @@ public class RoadSimStatistics implements SimulationListener {
 	
 	
 	private void log(String msg) {
-//		System.out.println("[STAT] " + msg);
+		System.out.println("[STAT] " + msg);
 	}
 
 }
