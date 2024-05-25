@@ -96,7 +96,9 @@ public class CarAgentExtended extends CarAgent {
 		}
 		
 		if (currentSpeed > 0) {
-			selectedAction = Optional.of(new MoveForward(currentSpeed * dt));
+			selectedAction = new MoveForward(currentSpeed * dt);
+		} else {
+			selectedAction = null;
 		}
 
 	}

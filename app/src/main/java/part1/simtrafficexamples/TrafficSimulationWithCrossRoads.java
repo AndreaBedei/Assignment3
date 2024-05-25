@@ -11,11 +11,15 @@ import part1.simtrafficbase.P2d;
 import part1.simtrafficbase.Road;
 import part1.simtrafficbase.RoadsEnv;
 import part1.simtrafficbase.TrafficLight;
+import akka.actor.typed.ActorSystem;
+import part1.simtrafficbase.*;
+import part1.simtrafficbase.messages.*;
 
 public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 
+	private ActorSystem<SimulationMessage> system;
 
-	public TrafficSimulationWithCrossRoads(int nThreads, boolean isRandom) {
+	public TrafficSimulationWithCrossRoads(boolean isRandom) {
 		super(isRandom);
 	}
 	
@@ -24,14 +28,13 @@ public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 		this.setupEnvironment(env);
 		
 		this.setupTimings(0, 1);
-				
-		/*TrafficLight tl1 = env.createTrafficLight(new P2d(740,300), TrafficLight.TrafficLightState.GREEN, 75, 25, 100);
+
+		system = ActorSystem.create(SimulationActor.create(this, env), "Environment");
+
+		TrafficLight tl1 = new TrafficLight("tl1", new P2d(740,300), TrafficLight.TrafficLightState.GREEN, 75, 25, 100);
 		
 		Road r1 = env.createRoad(new P2d(0,300), new P2d(1500,300));
-		r1.addTrafficLight(tl1, 740);
-		
-		List<CarAgent> cars = new ArrayList<>();
-		List<TrafficLight> lights = new ArrayList<>();
+		system.tell(new SpawnTL(tl1, 0, 740, 1));
 
 		CarAgent car1;
 		CarAgent car2;
@@ -54,14 +57,16 @@ public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 
 		}
 
-		this.addAgent(car1);
-		this.addAgent(car2);
+		system.tell(new SpawnCar(car1, 0, 1));
+		system.tell(new SpawnCar(car2, 0, 1));
 
 		
-		TrafficLight tl2 = env.createTrafficLight(new P2d(750,290),  TrafficLight.TrafficLightState.RED, 75, 25, 100);
+		TrafficLight tl2 = new TrafficLight("tl2", new P2d(750,290),  TrafficLight.TrafficLightState.RED, 75, 25, 100);
+
 
 		Road r2 = env.createRoad(new P2d(750,0), new P2d(750,600));
-		r2.addTrafficLight(tl2, 290);
+
+		system.tell(new SpawnTL(tl2, 1, 290, 1));
 
 		CarAgent car3;
 		CarAgent car4;
@@ -84,16 +89,8 @@ public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 
 		}
 
-		this.addAgent(car3);
-		this.addAgent(car4);
-		
-		cars.add(car1);
-		cars.add(car2);
-		cars.add(car3);
-		cars.add(car4);
-
-		lights.add(tl1);
-		lights.add(tl2);*/
+		system.tell(new SpawnCar(car3, 1, 1));
+		system.tell(new SpawnCar(car4, 1, 1));
 
 		this.syncWithTime(25);
 	}	
@@ -101,6 +98,13 @@ public class TrafficSimulationWithCrossRoads extends AbstractSimulation {
 	@Override
 	public void run(int nSteps) {
 		super.run(nSteps);
+		system.tell(new Begin());
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+		system.tell(new Stop());
 	}
 
 	@Override

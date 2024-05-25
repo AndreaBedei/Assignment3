@@ -18,24 +18,12 @@ public abstract class AbstractAgent {
 	protected AbstractAgent(String id) {
 		this.myId = id;
 	}
-	
-	/**
-	 * This method is called at the beginning of the simulation
-	 * 
-	 * @param env
-	 */
-	public void init(AbstractEnvironment env) {
-		this.env = env;
-	}
+
 
 	public abstract void decide(int dt);
 	
 
 	public String getId() {
 		return myId;
-	}
-	
-	protected AbstractEnvironment getEnv() {
-		return this.env;
 	}
 }

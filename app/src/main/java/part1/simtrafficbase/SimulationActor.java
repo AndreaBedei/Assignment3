@@ -29,7 +29,7 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
         super(context);
         this.sim = sim;
         this.env = env;
-        System.out.println("THE ACTOR IS ALIVE");
+        System.out.println("THE SIMULATION ACTOR IS ALIVE");
     }
 
     int tlStepsReceived = 0, carStepsReceived = 0;
@@ -38,14 +38,13 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
     public Receive<SimulationMessage> createReceive() {
         return newReceiveBuilder()
                 .onMessage(SpawnCar.class, msg -> {
-                    System.out.println("Registering car...");
+                    //getContext().spawn -> Tutti gli attori sono creati come figli del simulatorActor.
                     var actor = getContext().spawn(CarActor.create(msg.car(), msg.dt()), msg.car().getId());
                     this.carActors.add(actor);
                     this.env.registerNewCar(msg.car().getId(), msg.roadNum(), msg.car().getPos());
                     return this;
                 })
                 .onMessage(SpawnTL.class, msg -> {
-                    System.out.println("Registering tl...");
                     var actor = getContext().spawn(TrafficLightActor.create(msg.tl(), msg.dt()), msg.tl().getId());
                     this.tlActors.add(actor);
                     this.env.registerNewTL(msg.tl().getId(), msg.roadNum(), msg.pos(), msg.tl().getState());
@@ -54,12 +53,16 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
                 .onMessage(Begin.class, msg -> {
                     System.out.println("Beginning simulation...");
                     sim.startCycle();
-                    this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                    if (this.tlActors.isEmpty()) {
+                        this.carActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                    } else {
+                        this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                    }
                     return this;
                 })
                 .onMessage(TLAction.class, msg -> {
-                    System.out.println("Received tl action");
                     this.env.updateTlState(msg.id(), msg.state());
+                    // Se abbiamo aggiornato tutti i semafori, allora comunichiamo il nuovo step a tutte le macchine.
                     if (++tlStepsReceived == tlActors.size()) {
                         tlStepsReceived = 0;
                         this.carActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
@@ -67,37 +70,39 @@ public class SimulationActor extends AbstractBehavior<SimulationMessage> {
                     return this;
                 })
                 .onMessage(GetCurrentPercept.class, msg -> {
+                    // Arriva delle macchinine.
                     msg.sender().tell(new CurrentPercept((CarPercept) this.env.getCurrentPercepts(msg.id()), getContext().getSelf().narrow()));
                     return this;
                 })
                 .onMessage(CarAction.class, msg -> {
-                    System.out.println("Received car action");
-
-                    if (msg.action().isPresent()) {
-                        double newPos = this.env.doAction(msg.id(), msg.action().get());
+                    // Se il messaggio è nul la macchina è ferma.
+                    if (msg.action() != null) {
+                        double newPos = this.env.doAction(msg.id(), msg.action());
                         msg.sender().tell(new NewCarPosition(newPos));
                     }
-
+                    // Controlliamo se tutte le macchinine hanno fatto il loro step.
                     if (++carStepsReceived == carActors.size()) {
                         carStepsReceived = 0;
-                        System.out.println("RECEIVED ALL CAR ACTIONS");
-                        stepsDone++;
+                        stepsDone++; // Step simulazione incrementato.
                         sim.endCycleAndWait();
-
+                        // Se siamo arrivati alla fine.
                         if (stepsDone == env.getnSteps()) {
                             this.sim.stop();
+                            getContext().getSelf().tell(new Stop());
                         } else {
                             sim.startCycle();
-                            this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                            if (this.tlActors.isEmpty()) {
+                                this.carActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                            } else {
+                                this.tlActors.forEach(act -> act.tell(new Step(getContext().getSelf())));
+                            }
                         }
                     }
                     return this;
                 })
                 .onMessage(Stop.class, msg -> {
-                    System.out.println("Stopping...");
-                    tlActors.forEach(act -> act.tell(new Stop()));
-                    carActors.forEach(act -> act.tell(new Stop()));
-                    return Behaviors.stopped();
+                    System.out.println("\nStopping...");
+                    return Behaviors.stopped(); // Fermando il simulation actor si fermano anche tutti i figli.
                 })
                 .build();
     }

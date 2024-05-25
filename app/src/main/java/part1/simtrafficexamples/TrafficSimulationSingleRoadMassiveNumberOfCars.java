@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import akka.actor.typed.ActorSystem;
 import part1.simengineseq.AbstractSimulation;
-import part1.simtrafficbase.CarAgent;
-import part1.simtrafficbase.CarAgentBasic;
-import part1.simtrafficbase.P2d;
-import part1.simtrafficbase.Road;
-import part1.simtrafficbase.RoadsEnv;
+import part1.simtrafficbase.*;
+import part1.simtrafficbase.messages.Begin;
+import part1.simtrafficbase.messages.SimulationMessage;
+import part1.simtrafficbase.messages.SpawnCar;
 
 public class TrafficSimulationSingleRoadMassiveNumberOfCars extends AbstractSimulation {
 	private int numCars;
-	private final int nThreads;
-
+	private ActorSystem<SimulationMessage> system;
 	
-	public TrafficSimulationSingleRoadMassiveNumberOfCars(int numCars, int nThreads, boolean isRandom) {
+	public TrafficSimulationSingleRoadMassiveNumberOfCars(int numCars, boolean isRandom) {
 		super(isRandom);
 		this.numCars = numCars;
-		this.nThreads = nThreads;
 	}
 	
 	public void setup() {
@@ -28,9 +26,9 @@ public class TrafficSimulationSingleRoadMassiveNumberOfCars extends AbstractSimu
 		
 		this.setupTimings(0, 1);
 
-		Road road = env.createRoad(new P2d(0,300), new P2d(15000,300));
+		system = ActorSystem.create(SimulationActor.create(this, env), "Environment");
 
-		List<CarAgent> cars = new ArrayList<>();
+		Road road = env.createRoad(new P2d(0,300), new P2d(15000,300));
 
 		Random gen = new Random(super.getRandomSeed());
 
@@ -55,10 +53,9 @@ public class TrafficSimulationSingleRoadMassiveNumberOfCars extends AbstractSimu
 									carAcceleration, 
 									carDeceleration,
 									carMaxSpeed);
+
 			
-			cars.add(car);
-			
-			this.addAgent(car);
+			system.tell(new SpawnCar(car, 0, 1));
 			
 			/* no sync with wall-time */
 		}
@@ -66,6 +63,7 @@ public class TrafficSimulationSingleRoadMassiveNumberOfCars extends AbstractSimu
 	@Override
 	public void run(int nSteps) {
 		super.run(nSteps);
+		system.tell(new Begin());
 	}
 
 	@Override
@@ -80,11 +78,6 @@ public class TrafficSimulationSingleRoadMassiveNumberOfCars extends AbstractSimu
 
 	protected void setupEnvironment(RoadsEnv env) {
 		super.setupEnvironment(env);
-	}
-
-	@Override
-	public long getSimulationDuration() {
-		return 0;
 	}
 }
 	

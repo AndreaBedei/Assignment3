@@ -11,6 +11,9 @@ import part1.simtrafficbase.P2d;
 import part1.simtrafficbase.Road;
 import part1.simtrafficbase.RoadsEnv;
 import part1.simtrafficbase.TrafficLight;
+import part1.simtrafficbase.messages.*;
+import akka.actor.typed.ActorSystem;
+import part1.simtrafficbase.*;
 
 /**
  * 
@@ -19,10 +22,10 @@ import part1.simtrafficbase.TrafficLight;
  */
 public class TrafficSimulationSingleRoadWithTrafficLightTwoCars extends AbstractSimulation {
 
+	private ActorSystem<SimulationMessage> system;
 
-	public TrafficSimulationSingleRoadWithTrafficLightTwoCars(int nThreads, boolean isRandom) {
+	public TrafficSimulationSingleRoadWithTrafficLightTwoCars(boolean isRandom) {
 		super(isRandom);
-
 	}
 	
 	public void setup() {
@@ -30,16 +33,13 @@ public class TrafficSimulationSingleRoadWithTrafficLightTwoCars extends Abstract
 		RoadsEnv env = new RoadsEnv(this);
 		this.setupEnvironment(env);
 		this.setupTimings(0, 1);
-		
 
-				
-		/*Road r = env.createRoad(new P2d(0,300), new P2d(1500,300));
+		system = ActorSystem.create(SimulationActor.create(this, env), "Environment");
 
-		TrafficLight tl = env.createTrafficLight(new P2d(740,300), TrafficLight.TrafficLightState.GREEN, 75, 25, 100);
-		r.addTrafficLight(tl, 740);
-		
-		List<CarAgent> cars = new ArrayList<>();
-		List<TrafficLight> lights = new ArrayList<>();
+		Road r = env.createRoad(new P2d(0,300), new P2d(1500,300));
+
+		TrafficLight tl = new TrafficLight("tl", new P2d(740,300), TrafficLight.TrafficLightState.GREEN, 75, 25, 100);
+		system.tell(new SpawnTL(tl, 0, 330, 1));
 
 		CarAgent car1;
 		CarAgent car2;
@@ -57,25 +57,24 @@ public class TrafficSimulationSingleRoadWithTrafficLightTwoCars extends Abstract
 		} else{
 			// No random in this simulation.
 			car1 = new CarAgentExtended("car-1", env, r, 0, 0.1, 0.3, 6);
-
 			car2 = new CarAgentExtended("car-2", env, r, 100, 0.1, 0.3, 5);
+
 		}
-
-		this.addAgent(car1);
-		this.addAgent(car2);
-
-		cars.add(car1);
-		cars.add(car2);
-
-		lights.add(tl);*/
-
-
+		system.tell(new SpawnCar(car1, 0, 1));
+		system.tell(new SpawnCar(car2, 0, 1));
 		this.syncWithTime(25);
 	}	
 	
 	@Override
 	public void run(int nSteps) {
 		super.run(nSteps);
+		system.tell(new Begin());
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+		system.tell(new Stop());
 	}
 
 	@Override

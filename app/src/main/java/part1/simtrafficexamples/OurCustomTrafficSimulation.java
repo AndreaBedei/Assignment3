@@ -24,6 +24,7 @@ public class OurCustomTrafficSimulation extends AbstractSimulation {
 
         this.setupTimings(0, 1);
 
+        // Tutti i messaggi che invia il sistema li invia al simulation actor.
         system = ActorSystem.create(SimulationActor.create(this, env), "Environment");
 
         // Road 1 creation.
@@ -93,7 +94,6 @@ public class OurCustomTrafficSimulation extends AbstractSimulation {
     @Override
     public void run(int nSteps) {
         super.run(nSteps);
-        System.out.println("START");
         system.tell(new Begin());
     }
 

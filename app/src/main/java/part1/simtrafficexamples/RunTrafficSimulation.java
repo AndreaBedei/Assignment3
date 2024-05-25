@@ -21,12 +21,10 @@ import java.util.Map;
 public class RunTrafficSimulation {
 
 	public static void main(String[] args) {
-//		int nThreads = Runtime.getRuntime().availableProcessors();
-//		System.out.println("Numero thread = " + nThreads);
-		//var simulation = new TrafficSimulationSingleRoadTwoCars(nThreads, false);
-		//var simulation = new TrafficSimulationSingleRoadSeveralCars(nThreads, false);
-		//var simulation = new TrafficSimulationSingleRoadWithTrafficLightTwoCars(nThreads, false);
-		//var simulation = new TrafficSimulationWithCrossRoads(nThreads, false);
+		//var simulation = new TrafficSimulationSingleRoadTwoCars(false);
+		//var simulation = new TrafficSimulationSingleRoadSeveralCars(false);
+		//var simulation = new TrafficSimulationSingleRoadWithTrafficLightTwoCars(true);
+		//var simulation = new TrafficSimulationWithCrossRoads(false);
 		var simulation = new OurCustomTrafficSimulation(false);
 
 		RoadSimStatistics stat = new RoadSimStatistics();

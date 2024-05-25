@@ -10,6 +10,12 @@ import part1.simtrafficbase.CarAgentBasic;
 import part1.simtrafficbase.P2d;
 import part1.simtrafficbase.Road;
 import part1.simtrafficbase.RoadsEnv;
+import part1.simtrafficbase.messages.Begin;
+import part1.simtrafficbase.messages.SimulationMessage;
+import part1.simtrafficbase.messages.SpawnCar;
+import akka.actor.typed.ActorSystem;
+import part1.simtrafficbase.*;
+import part1.simtrafficbase.messages.Stop;
 
 /**
  * 
@@ -19,23 +25,25 @@ import part1.simtrafficbase.RoadsEnv;
  */
 public class TrafficSimulationSingleRoadSeveralCars extends AbstractSimulation {
 
-	public TrafficSimulationSingleRoadSeveralCars(int nThreads, boolean isRandom) {
+	private ActorSystem<SimulationMessage> system;
+
+	public TrafficSimulationSingleRoadSeveralCars(boolean isRandom) {
 		super(isRandom);
 	}
-	
+
+	// TODO: resto delle simulazioni ad attori
+
 	public void setup() {
 
 		RoadsEnv env = new RoadsEnv(this);
 		this.setupEnvironment(env);
 		this.setupTimings(0, 1);
-
-
 		
 		Road road = env.createRoad(new P2d(0,300), new P2d(1500,300));
 
 		int nCars = 30;
 
-		List<CarAgent> cars = new ArrayList<>();
+		system = ActorSystem.create(SimulationActor.create(this, env), "Environment");
 
 		Random gen = new Random(super.getRandomSeed());
 
@@ -62,10 +70,8 @@ public class TrafficSimulationSingleRoadSeveralCars extends AbstractSimulation {
 									carAcceleration, 
 									carDeceleration,
 									carMaxSpeed);
-			
-			cars.add(car);
-			this.addAgent(car);
 
+			system.tell(new SpawnCar(car, 0, 1));
 		}
 
 		this.syncWithTime(25);
@@ -74,6 +80,13 @@ public class TrafficSimulationSingleRoadSeveralCars extends AbstractSimulation {
 	@Override
 	public void run(int nSteps) {
 		super.run(nSteps);
+		system.tell(new Begin());
+	}
+
+	@Override
+	public void stop() {
+		super.stop();
+		system.tell(new Stop());
 	}
 
 	@Override
