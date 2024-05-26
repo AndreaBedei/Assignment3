@@ -1,6 +1,8 @@
 package part2;
 
 import javax.swing.*;
+
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.rmi.server.UnicastRemoteObject;
@@ -12,6 +14,7 @@ import java.rmi.registry.LocateRegistry;
 public class PlayerImpl implements Player{
 
     private SudokuBoard board;
+    private transient SudokuGUI gui; 
 
     public PlayerImpl(){}
 
@@ -24,8 +27,15 @@ public class PlayerImpl implements Player{
         return board;
     }
 
-    public static void main(String[] args) {
+    public SudokuGUI getSudokuGUI(){
+        return this.gui;
+    }
 
+    public void setSudokuGUI(SudokuGUI gui){
+        this.gui = gui;
+    }
+
+    public static void main(String[] args) {
         try {
             PlayerImpl player = new PlayerImpl();
 
@@ -40,9 +50,10 @@ public class PlayerImpl implements Player{
             server.setPlayer(args[0]);
             List<String> li = server.getPlayers();
 
+
             if(li.size() == 1){
-                System.out.println("Giocatore Ha creato partita");
-                player.setBoard(new SudokuBoardImpl());
+                System.out.println("Player has created the game");
+                player.setBoard((SudokuBoard)UnicastRemoteObject.exportObject(new SudokuBoardImpl(), 0));
 
             } else {
                 String playerName = li.stream().filter(x -> !x.equals(args[0])).findFirst().get();
@@ -51,20 +62,24 @@ public class PlayerImpl implements Player{
                 System.out.println("Giocatore si è unito alla partita");
             }
 
+            player.setSudokuGUI(new SudokuGUI(player));
+
+            player.getSudokuBoard().registerCallback(playerStub);
+
             li.forEach(el -> System.out.println("Player: " + el));
 
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        new SudokuGUI(player);
-                    } catch (RemoteException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+            
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void notifyClient(Pair<Integer, Integer> position, Integer value, Boolean selected) throws RemoteException {
+        if(value != null){
+            gui.newCellWritten(position, value);
+        } else {
+            gui.newCellSelected(position, selected);
         }
     }
 }

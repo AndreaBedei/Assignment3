@@ -1,0 +1,54 @@
+file:///C:/Users/fabio/Desktop/Assignment3/app/src/main/java/part2/SudokuBoard.java
+### java.util.NoSuchElementException: next on empty iterator
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+Scala version: 3.3.3
+Classpath:
+<HOME>\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala3-library_3\3.3.3\scala3-library_3-3.3.3.jar [exists ], <HOME>\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\2.13.12\scala-library-2.13.12.jar [exists ]
+Options:
+
+
+
+action parameters:
+offset: 241
+uri: file:///C:/Users/fabio/Desktop/Assignment3/app/src/main/java/part2/SudokuBoard.java
+text:
+```scala
+package part2;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface SudokuBoard extends Remote {
+    public void setCell(int x, int y, int value) throws RemoteException@@;
+    public ArrayList<Map.Entry<Pair<Integer, Integer>, Integer>> getCells() throws RemoteException;
+    public ArrayList<Pair<Integer, Integer>> getSelectedCells() throws RemoteException;
+    public void toggleSelectedCell(int x, int y) throws RemoteException;
+    void registerCallback(CallbackInterface callback) throws RemoteException;
+}
+
+```
+
+
+
+#### Error stacktrace:
+
+```
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.HoverProvider$.hover(HoverProvider.scala:36)
+	scala.meta.internal.pc.ScalaPresentationCompiler.hover$$anonfun$1(ScalaPresentationCompiler.scala:366)
+```
+#### Short summary: 
+
+java.util.NoSuchElementException: next on empty iterator

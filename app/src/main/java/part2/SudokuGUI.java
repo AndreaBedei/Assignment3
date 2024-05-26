@@ -12,6 +12,7 @@ public class SudokuGUI {
     private static final int GRID_SIZE = 9;
     private static final int SUBGRID_SIZE = 3;
     private JTextField[][] cells;
+    private Pair<Integer, Integer> selectedCell;
 
     public SudokuGUI(Player player) throws RemoteException {
         JFrame frame = new JFrame("Sudoku");
@@ -40,6 +41,10 @@ public class SudokuGUI {
                     @Override
                     public void focusGained(FocusEvent e) {
                         try {
+                            if(selectedCell != null){
+                                board.toggleSelectedCell(selectedCell.first(), selectedCell.second());
+                            }
+                            selectedCell = new Pair<>(r, c);
                             board.toggleSelectedCell(r, c);
                         } catch (RemoteException e1) {
                             e1.printStackTrace();
@@ -49,8 +54,12 @@ public class SudokuGUI {
                     @Override
                     public void focusLost(FocusEvent e) {
                         try {
-                            board.toggleSelectedCell(r, c);
-                            int v = Integer.parseInt(cells[r][c].getText());
+                            String text = cells[r][c].getText();
+                            if(text.length() == 0){
+                                board.setCell(r, c, 0);
+                                return;
+                            }
+                            int v = Integer.parseInt(text);
                             if(v > 0 && v<10){
                                 board.setCell(r, c, v);
                             }
@@ -58,6 +67,7 @@ public class SudokuGUI {
                             e1.printStackTrace();
                         }
                         catch(NumberFormatException e1){
+                            cells[r][c].setText("");
                         }
                     }
                 });
@@ -95,6 +105,25 @@ public class SudokuGUI {
 
         frame.setSize(600, 600);
         frame.setVisible(true);
+    }
+
+    public void newCellSelected(Pair<Integer, Integer> position, boolean selected){
+        int row = position.first();
+        int col = position.second();
+        if(selected){
+            cells[row][col].setBackground(Color.GREEN);
+        } else {
+            if (this.isColoredDifferently(row, col)) {
+                cells[row][col].setBackground(new Color(220, 220, 220));
+            } else {
+                cells[row][col].setBackground(Color.WHITE);
+            }
+        }
+    }
+
+    public void newCellWritten(Pair<Integer, Integer> position, int val){
+        System.out.println("NUOVA CELLAAAAAAAAAAAAAAAAAA: "+ val);
+        cells[position.first()][position.second()].setText(val == 0 ? "" : Integer.toString(val));
     }
 
     private boolean isSolutionValid() {
@@ -136,7 +165,7 @@ public class SudokuGUI {
 
     private boolean isColoredDifferently(int row, int col){
         return (row / SUBGRID_SIZE + col / SUBGRID_SIZE) % 2 == 0;
-    }
+    } 
 }
 
     

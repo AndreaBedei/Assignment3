@@ -10,4 +10,5 @@ public interface SudokuBoard extends Remote {
     public ArrayList<Map.Entry<Pair<Integer, Integer>, Integer>> getCells() throws RemoteException;
     public ArrayList<Pair<Integer, Integer>> getSelectedCells() throws RemoteException;
     public void toggleSelectedCell(int x, int y) throws RemoteException;
+    void registerCallback(CallbackInterface callback) throws RemoteException;
 }
