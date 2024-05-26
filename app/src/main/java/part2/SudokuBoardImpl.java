@@ -1,41 +1,46 @@
 package part2;
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 
-public class SudokuBoardImpl implements SudokuBoard {
+public class SudokuBoardImpl implements SudokuBoard, Serializable{
     
     private Map<Pair<Integer,Integer>, Integer> board = new HashMap<>();
+    private Set<Pair<Integer,Integer>> selected = new HashSet<>();
 
-    //-1 vuota, non selezionata
-    //0 vuota, selezionata
-    //1 a 9 valore inserito
     public SudokuBoardImpl(){
-        for(int i = 0; i<9; i++){
-            for(int j = 0; j<9; j++){
-                board.put(new Pair<Integer,Integer>(i, j), -1);
-            }
+    }
+
+    @Override
+    public void setCell(int x, int y, int value) {
+        this.board.put(new Pair<>(x,y), value);
+    }
+
+    @Override
+    public void toggleSelectedCell(int x, int y) {
+        var p = new Pair<>(x,y);
+        if(this.selected.contains(p)){
+            this.selected.add(p);
+        } else {
+            this.selected.remove(p);
         }
     }
 
     @Override
-    public boolean setCell(int x, int y, int value) {
-        if(board.get(new Pair<>(x, y)) == 0){
-            this.board.remove(new Pair<>(x,y), 0);
-            this.board.put(new Pair<>(x,y), value);
-            return true;   
-        }
-        return false;
+    public ArrayList<Entry<Pair<Integer, Integer>, Integer>> getCells() throws RemoteException {
+        return board.entrySet().stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
-    public boolean selectCell(int x, int y) {
-        if(board.get(new Pair<>(x, y)) == -1){
-            this.board.remove(new Pair<>(x,y), -1);
-            this.board.put(new Pair<>(x,y), 0);
-            return true;   
-        }
-        return false;
+    public ArrayList<Pair<Integer, Integer>> getSelectedCells() throws RemoteException {
+        return selected.stream().collect(Collectors.toCollection(ArrayList::new));
     }
-
 }

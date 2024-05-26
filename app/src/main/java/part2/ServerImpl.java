@@ -1,6 +1,5 @@
 package part2;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -43,12 +42,7 @@ public class ServerImpl implements Server{
             registry.rebind(SERVER_NAME, serverStub); //prova rebind
             System.out.println("Server created.");
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-
     }
-
-    
 }
