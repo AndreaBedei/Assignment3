@@ -49,7 +49,7 @@ public class PlayerImpl implements Player{
 
             Server server = (Server) registry.lookup(ServerImpl.SERVER_NAME);
 
-            server.setPlayer(args[0]);
+            server.setPlayer(args[0], playerStub);
             List<String> li = server.getPlayers();
 
 
@@ -84,5 +84,10 @@ public class PlayerImpl implements Player{
         } else {
             gui.newCellSelected(position, selected);
         }
+    }
+
+    @Override
+    public void heartbeat() throws RemoteException {
+        return;
     }
 }

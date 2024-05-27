@@ -5,4 +5,5 @@ import java.rmi.RemoteException;
 
 public interface Player extends Remote, CallbackInterface{
     public SudokuBoard getSudokuBoard() throws RemoteException;
+    public void heartbeat() throws RemoteException;
 }

@@ -112,15 +112,6 @@ public class SudokuGenerator {
         return false;
     }
 
-    private static void printBoard(int[][] board) {
-        for (int r = 0; r < SIZE; r++) {
-            for (int d = 0; d < SIZE; d++) {
-                System.out.print(board[r][d] + " ");
-            }
-            System.out.println();
-        }
-    }
-
     public static Map<Pair<Integer, Integer>, Integer> generateSudokuMap(int[][] board) {
         Map<Pair<Integer, Integer>, Integer> map = new HashMap<>();
         int cellsToCopy = (SIZE * SIZE) /2;
@@ -136,9 +127,9 @@ public class SudokuGenerator {
         return map;
     }
 
-    private static void printMap(Map<Pair<Integer, Integer>, Integer> map) {
-        for (Map.Entry<Pair<Integer, Integer>, Integer> entry : map.entrySet()) {
-            System.out.println("Cell: (" + entry.getKey().first() + "," + entry.getKey().second() + ") - Value: " + entry.getValue());
-        }
-    }
+    // private static void printMap(Map<Pair<Integer, Integer>, Integer> map) {
+    //     for (Map.Entry<Pair<Integer, Integer>, Integer> entry : map.entrySet()) {
+    //         System.out.println("Cell: (" + entry.getKey().first() + "," + entry.getKey().second() + ") - Value: " + entry.getValue());
+    //     }
+    // }
 }

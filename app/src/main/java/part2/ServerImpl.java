@@ -3,10 +3,12 @@ package part2;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.HashSet;
 import java.util.List;
 
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.rmi.server.UnicastRemoteObject;
 
 
@@ -15,20 +17,43 @@ public class ServerImpl implements Server{
 
     public static final String SERVER_NAME = "serverObj";
 
-    private Set<String> playerNames = new HashSet<>();
+    private Map<String, Player> players = new HashMap<>();
     
-    public ServerImpl(){}
-
-    @Override
-    public List<String> getPlayers(){
-        return this.playerNames.stream().toList();
+    public ServerImpl(){
+        new Thread(() -> {
+            try {
+                while(true) {
+                    Set<String> toRemove = new HashSet<>();
+                    synchronized (players) {
+                        players.forEach((name, pl) -> {
+                            try {
+                                pl.heartbeat();
+                            } catch (RemoteException e) {
+                                System.out.println("Player " + name + " timed out");
+                                toRemove.add(name);
+                            }
+                        });
+                        toRemove.forEach(players::remove);
+                    } 
+                    Thread.sleep(5000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @Override
-    public void setPlayer(String name) throws RemoteException {
-        if(!playerNames.add(name)){
+    public synchronized List<String> getPlayers(){
+        return this.players.keySet().stream().toList();
+    }
+
+    @Override
+    public synchronized void setPlayer(String name, Player remotePlayer) throws RemoteException {
+        if(players.containsKey(name)){
             throw new RemoteException("Already defined.");
         }
+        players.put(name, remotePlayer);
     }
 
 
