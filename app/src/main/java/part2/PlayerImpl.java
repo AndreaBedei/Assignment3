@@ -1,8 +1,5 @@
 package part2;
 
-import javax.swing.*;
-
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.rmi.server.UnicastRemoteObject;
@@ -37,30 +34,33 @@ public class PlayerImpl implements Player{
 
     private static SudokuBoard mainBoard;
 
-    public static void main(String[] args) {
+    public void startGame(String selectedGame, String myGame){
         try {
             PlayerImpl player = new PlayerImpl();
 
             Player playerStub = (Player) UnicastRemoteObject.exportObject(player, 0);
             Registry registry = LocateRegistry.getRegistry();
 
-            registry.rebind(args[0], playerStub);
+            registry.rebind(myGame, playerStub);
             System.out.println("Player created.");
 
             Server server = (Server) registry.lookup(ServerImpl.SERVER_NAME);
 
-            server.setPlayer(args[0], playerStub);
+            System.out.println("myGame: "+myGame+ " playerStub" );
+            server.setPlayer(myGame, playerStub);
             List<String> li = server.getPlayers();
 
 
-            if(li.size() == 1){
+            if(selectedGame.equals(myGame)){
+                server.setCreators(myGame);
                 System.out.println("Player has created the game");
                 mainBoard = new SudokuBoardImpl();
                 player.setBoard((SudokuBoard)UnicastRemoteObject.exportObject(mainBoard, 0));
 
             } else {
-                String playerName = li.stream().filter(x -> !x.equals(args[0])).findFirst().get();
-                Player p = (Player) registry.lookup(playerName);
+                //String playerName = li.stream().filter(x -> !x.equals(myGame)).findFirst().get();
+                Player p = (Player) registry.lookup(selectedGame);
+
                 player.setBoard(p.getSudokuBoard());
                 System.out.println("Giocatore si è unito alla partita");
             }

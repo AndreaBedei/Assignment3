@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -18,6 +19,8 @@ public class ServerImpl implements Server{
     public static final String SERVER_NAME = "serverObj";
 
     private Map<String, Player> players = new HashMap<>();
+
+    private Set<String> playerCreators = new HashSet<>();
     
     public ServerImpl(){
         new Thread(() -> {
@@ -34,6 +37,7 @@ public class ServerImpl implements Server{
                             }
                         });
                         toRemove.forEach(players::remove);
+                        toRemove.forEach(playerCreators::remove); //TODO bertu
                     } 
                     Thread.sleep(5000);
                 }
@@ -54,6 +58,19 @@ public class ServerImpl implements Server{
             throw new RemoteException("Already defined.");
         }
         players.put(name, remotePlayer);
+    }
+
+    @Override
+    public synchronized void setCreators(String name) throws RemoteException {
+        if(!playerCreators.add(name)){
+            throw new RemoteException("Already defined.");
+        }
+    }
+
+
+    @Override
+    public Set<String> getCreators(){
+        return playerCreators;
     }
 
 
