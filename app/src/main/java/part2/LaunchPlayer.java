@@ -19,8 +19,6 @@ public class LaunchPlayer {
             List<String> li = server.getPlayers();
 
             String id = "p"+ li.size();
-
-            // Create and display the form
             SwingUtilities.invokeLater(() -> {
                 HomeGui frame;
                 try {
@@ -31,7 +29,6 @@ public class LaunchPlayer {
                 }
         });
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }        
     }

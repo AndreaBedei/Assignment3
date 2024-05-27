@@ -13,7 +13,7 @@ import java.util.HashSet;
 public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInterface{
     
     private Map<Pair<Integer,Integer>, Integer> board = new HashMap<>();
-    private Set<Pair<Integer,Integer>> selected = new HashSet<>();
+    private Map<Pair<Integer,Integer>, Integer> selected = new HashMap<>();
     private List<CallbackInterface> callbacks = new ArrayList<>();
 
     public SudokuBoardImpl(){
@@ -21,7 +21,7 @@ public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInter
     }
 
     @Override
-    public void setCell(int x, int y, int value) throws RemoteException{
+    public synchronized void setCell(int x, int y, int value) throws RemoteException{
         if(value != 0){
             this.board.put(new Pair<>(x,y), value);
             this.notifyClient(new Pair<>(x,y), value, null);
@@ -33,16 +33,29 @@ public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInter
     }
 
     @Override
-    public void toggleSelectedCell(int x, int y) throws RemoteException {
+    public synchronized void selectedCell(int x, int y) throws RemoteException {
         var p = new Pair<>(x,y);
-        if(!this.selected.contains(p)){
-            this.selected.add(p);
-            this.notifyClient(new Pair<>(x,y), null, true);
+        if(!this.selected.containsKey(p)){
+            this.selected.put(p, 1);
         } else {
-            this.selected.remove(p);
-            this.notifyClient(new Pair<>(x,y), null, false);
+            var v = this.selected.get(p);
+            this.selected.put(p, v+1);
         }
+        this.notifyClient(new Pair<>(x,y), null, true);
     }
+
+    @Override
+    public synchronized void deselectedCell(int x, int y) throws RemoteException {
+        var p = new Pair<>(x,y);
+        var v = this.selected.get(p);
+        if(v == 1){
+            this.selected.remove(p);
+        } else {
+            this.selected.put(p, v-1);
+        }
+        this.notifyClient(new Pair<>(x,y), null, false);
+    }
+    
 
     @Override
     public ArrayList<Pair<Pair<Integer, Integer>, Integer>> getCells() throws RemoteException {
@@ -51,7 +64,7 @@ public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInter
 
     @Override
     public ArrayList<Pair<Integer, Integer>> getSelectedCells() throws RemoteException {
-        return selected.stream().collect(Collectors.toCollection(ArrayList::new));
+        return selected.keySet().stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override

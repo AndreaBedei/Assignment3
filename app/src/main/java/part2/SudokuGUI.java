@@ -13,12 +13,13 @@ public class SudokuGUI {
     private static final int SUBGRID_SIZE = 3;
     private JTextField[][] cells;
     private Pair<Integer, Integer> selectedCell;
+    private SudokuBoard board;
 
     public SudokuGUI(Player player) throws RemoteException {
         JFrame frame = new JFrame("Sudoku");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
-        SudokuBoard board = player.getSudokuBoard();
+        this.board = player.getSudokuBoard();
 
         JPanel gridPanel = new JPanel(new GridLayout(GRID_SIZE, GRID_SIZE));
         cells = new JTextField[GRID_SIZE][GRID_SIZE];
@@ -42,12 +43,14 @@ public class SudokuGUI {
                     public void focusGained(FocusEvent e) {
                         try {
                             if(selectedCell != null){
-                                board.toggleSelectedCell(selectedCell.first(), selectedCell.second());
+                                board.deselectedCell(selectedCell.first(), selectedCell.second());
                             }
                             selectedCell = new Pair<>(r, c);
-                            board.toggleSelectedCell(r, c);
+                            board.selectedCell(r, c);
                         } catch (RemoteException e1) {
-                            e1.printStackTrace();
+                            gridPanel.setVisible(false);
+                            JOptionPane.showMessageDialog(frame, "I'm sorry the main host has been disconnected!");
+                            System.exit(0);
                         }
                     }
 
@@ -62,12 +65,18 @@ public class SudokuGUI {
                             int v = Integer.parseInt(text);
                             if(v > 0 && v<10){
                                 board.setCell(r, c, v);
+                            } else {
+                                cells[r][c].setText("");
+                                board.setCell(r, c, 0);
                             }
                         } catch (RemoteException e1) {
-                            e1.printStackTrace();
-                        }
-                        catch(NumberFormatException e1){
-                            cells[r][c].setText("");
+                        } catch(NumberFormatException e1){
+                            try {
+                                cells[r][c].setText("");
+                                board.setCell(r, c, 0);
+                            } catch (RemoteException e2) {
+                                e2.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -75,10 +84,7 @@ public class SudokuGUI {
             }
         }
 
-        
-        // Prendiamo i valori presenti e selezionati.
         board.getCells().forEach(e -> {
-            System.out.println(e.first() + e.second().toString());
             var pos = e.first();
             var value = e.second();
             cells[pos.first()][pos.second()].setText(Integer.toString(value));
@@ -109,12 +115,12 @@ public class SudokuGUI {
         frame.setVisible(true);
     }
 
-    public void newCellSelected(Pair<Integer, Integer> position, boolean selected){
+    public void newCellSelected(Pair<Integer, Integer> position, boolean selected) throws RemoteException{
         int row = position.first();
         int col = position.second();
         if(selected){
             cells[row][col].setBackground(Color.GREEN);
-        } else {
+        } else if(!this.board.getSelectedCells().contains(new Pair<>(row, col))){
             if (this.isColoredDifferently(row, col)) {
                 cells[row][col].setBackground(new Color(220, 220, 220));
             } else {
@@ -124,7 +130,6 @@ public class SudokuGUI {
     }
 
     public void newCellWritten(Pair<Integer, Integer> position, int val){
-        System.out.println("NUOVA CELLAAAAAAAAAAAAAAAAAA: "+ val);
         cells[position.first()][position.second()].setText(val == 0 ? "" : Integer.toString(val));
     }
 

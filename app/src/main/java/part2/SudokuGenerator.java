@@ -120,16 +120,10 @@ public class SudokuGenerator {
             int col = random.nextInt(SIZE);
             if (board[row][col] != 0) {
                 map.put(new Pair<>(row, col), board[row][col]);
-                board[row][col] = 0;  // Remove number from the board after adding to map
+                board[row][col] = 0;
                 cellsToCopy--;
             }
         }
         return map;
     }
-
-    // private static void printMap(Map<Pair<Integer, Integer>, Integer> map) {
-    //     for (Map.Entry<Pair<Integer, Integer>, Integer> entry : map.entrySet()) {
-    //         System.out.println("Cell: (" + entry.getKey().first() + "," + entry.getKey().second() + ") - Value: " + entry.getValue());
-    //     }
-    // }
 }

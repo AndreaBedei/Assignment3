@@ -1,7 +1,6 @@
 package part2;
 
 import java.rmi.RemoteException;
-import java.util.List;
 import java.rmi.server.UnicastRemoteObject;
 
 import java.rmi.registry.Registry;
@@ -46,32 +45,21 @@ public class PlayerImpl implements Player{
 
             Server server = (Server) registry.lookup(ServerImpl.SERVER_NAME);
 
-            System.out.println("myGame: "+myGame+ " playerStub" );
             server.setPlayer(myGame, playerStub);
-            List<String> li = server.getPlayers();
-
 
             if(selectedGame.equals(myGame)){
                 server.setCreators(myGame);
-                System.out.println("Player has created the game");
                 mainBoard = new SudokuBoardImpl();
                 player.setBoard((SudokuBoard)UnicastRemoteObject.exportObject(mainBoard, 0));
 
             } else {
-                //String playerName = li.stream().filter(x -> !x.equals(myGame)).findFirst().get();
                 Player p = (Player) registry.lookup(selectedGame);
-
                 player.setBoard(p.getSudokuBoard());
-                System.out.println("Giocatore si è unito alla partita");
             }
 
             player.setSudokuGUI(new SudokuGUI(player));
 
-            player.getSudokuBoard().registerCallback(playerStub);
-
-            li.forEach(el -> System.out.println("Player: " + el));
-
-            
+            player.getSudokuBoard().registerCallback(playerStub);   
         } catch (Exception e) {
             e.printStackTrace();
         }

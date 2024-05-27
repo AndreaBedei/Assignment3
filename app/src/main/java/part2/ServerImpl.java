@@ -32,7 +32,6 @@ public class ServerImpl implements Server{
                             try {
                                 pl.heartbeat();
                             } catch (RemoteException e) {
-                                System.out.println("Player " + name + " timed out");
                                 toRemove.add(name);
                             }
                         });
