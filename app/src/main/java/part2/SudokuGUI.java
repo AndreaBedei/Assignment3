@@ -39,38 +39,42 @@ public class SudokuGUI {
                 final int c = col;
                 cells[row][col].addFocusListener(new FocusListener(){
 
+                    // Aggiunta di un FocusListener per gestire gli eventi di focus.
                     @Override
                     public void focusGained(FocusEvent e) {
                         try {
+                            // Deseleziona la cella precedente, se esiste.
                             if(selectedCell != null){
                                 board.deselectedCell(selectedCell.first(), selectedCell.second());
                             }
+                            // Seleziona la nuova cella.
                             selectedCell = new Pair<>(r, c);
                             board.selectedCell(r, c);
                         } catch (RemoteException e1) {
                             gridPanel.setVisible(false);
                             JOptionPane.showMessageDialog(frame, "I'm sorry the main host has been disconnected!");
-                            System.exit(0);
+                            System.exit(0); // Uscita dall'applicazione, il client creatore si è disconesso.
                         }
                     }
 
                     @Override
                     public void focusLost(FocusEvent e) {
                         try {
-                            String text = cells[r][c].getText();
+                            String text = cells[r][c].getText();  // Ottiene il testo dalla cella.
                             if(text.length() == 0){
-                                board.setCell(r, c, 0);
+                                board.setCell(r, c, 0); // Imposta il valore della cella a 0 se il testo è vuoto.
                                 return;
                             }
                             int v = Integer.parseInt(text);
                             if(v > 0 && v<10){
-                                board.setCell(r, c, v);
+                                board.setCell(r, c, v); // Imposta il valore della cella se è valido.
                             } else {
-                                cells[r][c].setText("");
+                                cells[r][c].setText(""); // Resetta il testo della cella se il valore non è valido.
                                 board.setCell(r, c, 0);
                             }
                         } catch (RemoteException e1) {
                         } catch(NumberFormatException e1){
+                            // Resetta il testo della cella in caso di eccezione di formato.
                             try {
                                 cells[r][c].setText("");
                                 board.setCell(r, c, 0);
@@ -84,11 +88,14 @@ public class SudokuGUI {
             }
         }
 
+        // Imposta i valori iniziali delle celle sulla base della scacchiera del Sudoku
         board.getCells().forEach(e -> {
             var pos = e.first();
             var value = e.second();
             cells[pos.first()][pos.second()].setText(Integer.toString(value));
         });
+
+        // Imposta le celle selezionate.
         board.getSelectedCells().forEach(p ->{
             cells[p.first()][p.second()].setBackground(Color.GREEN);
         });
@@ -115,6 +122,7 @@ public class SudokuGUI {
         frame.setVisible(true);
     }
 
+    // Gestisce la selezione di una nuova cella.
     public void newCellSelected(Pair<Integer, Integer> position, boolean selected) throws RemoteException{
         int row = position.first();
         int col = position.second();

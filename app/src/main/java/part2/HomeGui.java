@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+// Gui per la scelta della partita.
 public class HomeGui extends JFrame {
 
     private String selectedGame;
@@ -18,6 +19,7 @@ public class HomeGui extends JFrame {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton createGameButton = new JButton("CREATE GAME");
 
+        // Crea un nuovo game.
         createGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -34,6 +36,7 @@ public class HomeGui extends JFrame {
         String[] existingGames = liPlayers.toArray(new String[0]);
         JComboBox<String> existingGamesComboBox = new JComboBox<>(existingGames);
 
+        // Si seleziona un game da quelli correnti.
         selectExistingButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -54,8 +57,6 @@ public class HomeGui extends JFrame {
         add(mainPanel);
         setSize(400, 200);
         setLocationRelativeTo(null);
-
-        
     }
 
     public String getSelectedGame(){
