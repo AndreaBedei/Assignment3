@@ -2,7 +2,6 @@ package part2;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.List;
@@ -18,6 +17,7 @@ public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInter
     private List<CallbackInterface> callbacks = new ArrayList<>();
 
     public SudokuBoardImpl(){
+        SudokuGenerator.getSudokuGrid().entrySet().forEach(x -> board.put(x.getKey(), x.getValue()));
     }
 
     @Override
@@ -45,8 +45,8 @@ public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInter
     }
 
     @Override
-    public ArrayList<Entry<Pair<Integer, Integer>, Integer>> getCells() throws RemoteException {
-        return board.entrySet().stream().collect(Collectors.toCollection(ArrayList::new));
+    public ArrayList<Pair<Pair<Integer, Integer>, Integer>> getCells() throws RemoteException {
+        return board.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override

@@ -75,10 +75,12 @@ public class SudokuGUI {
             }
         }
 
+        
         // Prendiamo i valori presenti e selezionati.
         board.getCells().forEach(e -> {
-            var pos = e.getKey();
-            var value = e.getValue();
+            System.out.println(e.first() + e.second().toString());
+            var pos = e.first();
+            var value = e.second();
             cells[pos.first()][pos.second()].setText(Integer.toString(value));
         });
         board.getSelectedCells().forEach(p ->{

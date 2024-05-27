@@ -35,6 +35,8 @@ public class PlayerImpl implements Player{
         this.gui = gui;
     }
 
+    private static SudokuBoard mainBoard;
+
     public static void main(String[] args) {
         try {
             PlayerImpl player = new PlayerImpl();
@@ -53,7 +55,8 @@ public class PlayerImpl implements Player{
 
             if(li.size() == 1){
                 System.out.println("Player has created the game");
-                player.setBoard((SudokuBoard)UnicastRemoteObject.exportObject(new SudokuBoardImpl(), 0));
+                mainBoard = new SudokuBoardImpl();
+                player.setBoard((SudokuBoard)UnicastRemoteObject.exportObject(mainBoard, 0));
 
             } else {
                 String playerName = li.stream().filter(x -> !x.equals(args[0])).findFirst().get();
