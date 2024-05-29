@@ -1,11 +1,8 @@
 package part2;
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInterface{
@@ -78,13 +75,15 @@ public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInter
     @Override
     public void notifyClient(Pair<Integer, Integer> position, Integer value, Boolean selected) throws RemoteException {
         if(callbacks != null){
+            Set<CallbackInterface> remove = new HashSet<>();
             callbacks.forEach(c -> {
                 try {
                     c.notifyClient(position, value, selected);
                 } catch (RemoteException e) {
-                    e.printStackTrace();
+                    remove.add(c);
                 }
             });
+            remove.forEach(callbacks::remove);
         }
     }
 
