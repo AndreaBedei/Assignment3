@@ -14,9 +14,9 @@ public class SudokuGUI {
     private JTextField[][] cells;
     private Pair<Integer, Integer> selectedCell;
     private SudokuBoard board;
+    private JFrame frame = new JFrame("Sudoku");
 
-    public SudokuGUI(Player player) throws RemoteException {
-        JFrame frame = new JFrame("Sudoku");
+    public SudokuGUI(Player player) throws RemoteException { 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         this.board = player.getSudokuBoard();
@@ -180,6 +180,19 @@ public class SudokuGUI {
 
     private boolean isColoredDifferently(int row, int col){
         return (row / SUBGRID_SIZE + col / SUBGRID_SIZE) % 2 == 0;
+    }
+
+    public void resetFocus() {
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                if (this.isColoredDifferently(row, col)) {
+                    cells[row][col].setBackground(new Color(220, 220, 220));
+                } else {
+                    cells[row][col].setBackground(Color.WHITE);
+                }
+            }
+        }
+        // JOptionPane.showMessageDialog(frame, "Oh no, we lost one player!!!");
     } 
 }
 

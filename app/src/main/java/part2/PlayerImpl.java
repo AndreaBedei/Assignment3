@@ -81,7 +81,9 @@ public class PlayerImpl implements Player{
     // Metodo per notificare il client di un cambiamento sulla scacchiera
     @Override
     public void notifyClient(Pair<Integer, Integer> position, Integer value, Boolean selected) throws RemoteException {
-        if(value != null){
+        if(position==null) {
+            gui.resetFocus();
+        } else if(value != null){
             gui.newCellWritten(position, value);
         } else {
             gui.newCellSelected(position, selected);

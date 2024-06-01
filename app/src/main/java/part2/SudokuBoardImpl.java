@@ -84,6 +84,14 @@ public class SudokuBoardImpl implements SudokuBoard, Serializable, CallbackInter
                 }
             });
             remove.forEach(callbacks::remove);
+            if(!remove.isEmpty()){
+                callbacks.forEach(c -> {
+                    try {
+                        c.notifyClient(null, null, null);
+                    } catch (RemoteException e) {
+                    }
+                });
+            }
         }
     }
 
